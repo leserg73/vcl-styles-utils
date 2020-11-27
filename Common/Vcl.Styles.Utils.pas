@@ -188,7 +188,7 @@ begin
      for i:=0 to ChildNode.ChildNodes.Count-1 do
      begin
       oNode:= ChildNode.ChildNodes[i];
-      LClassName:='uHSLUtils.'+oNode.NodeName;
+      LClassName:='Vcl.Styles.Utils.Graphics.'+oNode.NodeName;
       RttiInstanceType := (Ctx.FindType(LClassName) as TRttiInstanceType);
       Value := RttiInstanceType.GetMethod('Create').Invoke(RttiInstanceType.MetaclassType,[StrToInt(oNode.Text)]);
       Filters.Add((Value.AsObject as TBitmapFilter));

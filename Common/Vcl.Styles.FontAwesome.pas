@@ -23,7 +23,7 @@ unit Vcl.Styles.FontAwesome;
 
 interface
 
-{$IF CompilerVersion >= 30.0}
+{$IF CompilerVersion >= 34.0}
 
  {$DEFINE WinXCtrls}
 {$ENDIF}

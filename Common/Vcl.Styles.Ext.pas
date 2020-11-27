@@ -262,8 +262,8 @@ uses
   Vcl.Dialogs, Vcl.Styles.Utils.Misc, Vcl.Styles.Utils.Graphics;
 
 {$IF (DEFINED (USE_VCL_STYLESAPI) AND (CompilerVersion >= 23))}
-{$I '..\source\vcl\StyleUtils.inc'}
-{$I '..\source\vcl\StyleAPI.inc'}
+{$I 'c:\Program Files\Embarcadero\Studio\20.0\source\vcl\StyleUtils.inc'}
+{$I 'c:\Program Files\Embarcadero\Studio\20.0\source\vcl\StyleAPI.inc'}
 {$IFEND}
 
 type
@@ -1376,7 +1376,7 @@ procedure DrawSampleWindow(Style: TCustomStyle; Canvas: TCanvas; ARect: TRect; c
   HICON: HICON = 0);
 var
   LDetails, CaptionDetails, IconDetails: TThemedElementDetails;
-  IconRect, BorderRect, CaptionRect, ButtonRect, TextRect: TRect;
+  IconRect, BorderRect, CaptionRect, ButtonRect, TextRect, LabelRect, EditRect, CheckBoxRect{, PanelRect}: TRect;
   CaptionBitmap: TBitmap;
   ThemeTextColor: TColor;
 
@@ -1498,27 +1498,87 @@ begin
   LDetails := Style.GetElementDetails(twFrameBottomActive);
   Style.DrawElement(Canvas.Handle, LDetails, CaptionRect);
 
-  // Draw Ok button
+{
+  //Draw Panel
+  LDetails := Style.GetElementDetails(tpPageDontCare);
+  PanelRect.Left:=7;
+  PanelRect.Top:=ARect.Height-142;
+  PanelRect.Width:=292;
+  PanelRect.Height:=100;
+  Style.DrawElement(Canvas.Handle, LDetails, PanelRect);
+  Style.GetElementColor(LDetails, ecTextColor, ThemeTextColor);
+}
+  //Draw Label
+  LDetails := Style.GetElementDetails(ttlTextLabelNormal);
+  LabelRect.Left:=18;
+  LabelRect.Top:=ARect.Height-130;
+  LabelRect.Width:=150;
+  LabelRect.Height:=16;
+  Style.DrawElement(Canvas.Handle, LDetails, LabelRect);
+  Style.GetElementColor(LDetails, ecTextColor, ThemeTextColor);
+  Style.DrawText(Canvas.Handle, LDetails, 'Select install path:', LabelRect, TTextFormatFlags(DT_LEFT or DT_WORDBREAK), ThemeTextColor);
+
+  //Draw Edit
+  LDetails := Style.GetElementDetails(teEditTextNormal);
+  EditRect.Left:=16;
+  EditRect.Top:=ARect.Height-114;
+  EditRect.Width:=240;
+  EditRect.Height:=21;
+  Style.DrawElement(Canvas.Handle, LDetails, EditRect);
+  Style.GetElementColor(LDetails, ecTextColor, ThemeTextColor);
+  Style.DrawText(Canvas.Handle, LDetails, ' C:\Program Files\My Program', EditRect, TTextFormatFlags(DT_LEFT or DT_VCENTER), ThemeTextColor);
+
+  //Draw [...] button
   LDetails := Style.GetElementDetails(tbPushButtonNormal);
-  ButtonRect.Left := 30;
-  ButtonRect.Top := ARect.Height - 45;
-  ButtonRect.Width := 75;
-  ButtonRect.Height := 25;
+  ButtonRect.Left:=ARect.Width-43;
+  ButtonRect.Top:=ARect.Height-114;
+  ButtonRect.Width:=25;
+  ButtonRect.Height:=21;
+  Style.DrawElement(Canvas.Handle, LDetails, ButtonRect);
+  Style.GetElementColor(LDetails, ecTextColor, ThemeTextColor);
+  Style.DrawText(Canvas.Handle, LDetails, '...', ButtonRect, TTextFormatFlags(DT_VCENTER or DT_CENTER), ThemeTextColor);
+
+  //Draw CheckBox
+  LDetails := Style.GetElementDetails(tbCheckBoxCheckedNormal);
+  CheckBoxRect.Left:=16;
+  CheckBoxRect.Top:=ARect.Height-86;
+  CheckBoxRect.Width:=16;
+  CheckBoxRect.Height:=16;
+  Style.DrawElement(Canvas.Handle, LDetails, CheckBoxRect);
+  Style.GetElementColor(LDetails, ecTextColor, ThemeTextColor);
+  Style.DrawText(Canvas.Handle, LDetails, '       Install for All users', CheckBoxRect, [tfLeft, tfSingleLine, tfVerticalCenter], ThemeTextColor);
+
+  //Draw CheckBox
+  LDetails := Style.GetElementDetails(tbCheckBoxUncheckedNormal);
+  CheckBoxRect.Left:=16;
+  CheckBoxRect.Top:=ARect.Height-68;
+  CheckBoxRect.Width:=16;
+  CheckBoxRect.Height:=16;
+  Style.DrawElement(Canvas.Handle, LDetails, CheckBoxRect);
+  Style.GetElementColor(LDetails, ecTextColor, ThemeTextColor);
+  Style.DrawText(Canvas.Handle, LDetails, '       Install for only current user', CheckBoxRect, [tfLeft, tfSingleLine, tfVerticalCenter], ThemeTextColor);
+
+  //Draw Next > button
+  LDetails := Style.GetElementDetails(tbPushButtonHot);
+  ButtonRect.Left:=ARect.Width-170;
+  ButtonRect.Top:=ARect.Height-35;
+  ButtonRect.Width:=75;
+  ButtonRect.Height:=23;
   Style.DrawElement(Canvas.Handle, LDetails, ButtonRect);
 
   Style.GetElementColor(LDetails, ecTextColor, ThemeTextColor);
-  Style.DrawText(Canvas.Handle, LDetails, 'OK', ButtonRect, TTextFormatFlags(DT_VCENTER or DT_CENTER), ThemeTextColor);
+  Style.DrawText(Canvas.Handle, LDetails, '&Next >', ButtonRect, TTextFormatFlags(DT_VCENTER or DT_CENTER), ThemeTextColor);
 
-  // Draw Cancel button
-  ButtonRect.Left := 110;
-  ButtonRect.Top := ARect.Height - 45;
-  ButtonRect.Width := 75;
-  ButtonRect.Height := 25;
+  //Draw Cancel button
+  LDetails := Style.GetElementDetails(tbPushButtonNormal);
+  ButtonRect.Left:=ARect.Width-90;
+  ButtonRect.Top:=ARect.Height-35;
+  ButtonRect.Width:=75;
+  ButtonRect.Height:=23;
   Style.DrawElement(Canvas.Handle, LDetails, ButtonRect);
 
   Style.GetElementColor(LDetails, ecTextColor, ThemeTextColor);
-  Style.DrawText(Canvas.Handle, LDetails, 'Cancel', ButtonRect, TTextFormatFlags(DT_VCENTER or DT_CENTER),
-    ThemeTextColor);
+  Style.DrawText(Canvas.Handle, LDetails, 'Cancel', ButtonRect, TTextFormatFlags(DT_VCENTER or DT_CENTER), ThemeTextColor);
 end;
 
 { TVclStylePreview }
