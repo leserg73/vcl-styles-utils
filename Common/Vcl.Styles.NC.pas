@@ -15,7 +15,7 @@
 // The Original Code is Vcl.Styles.NC.pas.
 //
 // The Initial Developer of the Original Code is Rodrigo Ruz V.
-// Portions created by Rodrigo Ruz V. are Copyright (C) 2014-2020 Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2014-2021 Rodrigo Ruz V.
 // All Rights Reserved.
 //
 // **************************************************************************************************
@@ -56,7 +56,7 @@ type
     FOwner: TNCControls;
     function GetItem(Index: Integer): TNCControl;
     procedure SetItem(Index: Integer; Value: TNCControl);
-    function Add: TNCControl;
+    //function Add: TNCControl;
   protected
     function GetOwner: TPersistent; override;
   public
@@ -2107,11 +2107,12 @@ begin
 end;
 
 { TListNCButtons }
+(*
 function TListNCControls.Add: TNCControl;
 begin
   Result := TNCControl(inherited Add);
 end;
-
+*)
 function RttiMethodInvokeEx(const MethodName: string; RttiType: TRttiType; Instance: TValue;
   const Args: array of TValue): TValue;
 var
@@ -2294,7 +2295,7 @@ procedure TNCControl.SetVisible(const Value: Boolean);
 begin
   if FVisible <> Value then
     FVisible := Value;
-  // TODO : Add parent notification
+  // TODO: Add parent notification
 end;
 
 procedure TNCControl.SetWidth(const Value: Integer);

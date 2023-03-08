@@ -15,7 +15,7 @@
 // The Original Code is Vcl.Styles.Ext.pas.
 //
 // The Initial Developer of the Original Code is Rodrigo Ruz V.
-// Portions created by Rodrigo Ruz V. are Copyright (C) 2012-2020 Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2012-2023 Rodrigo Ruz V.
 // All Rights Reserved.
 //
 // **************************************************************************************************
@@ -93,6 +93,7 @@ type
   TSourceInfo = record
     Data: TStyleServicesHandle;
     StyleClass: TCustomStyleServicesClass;
+    {$IF CompilerVersion >= 35}DesigningState: Boolean;{$IFEND}
   end;
 
 {$REGION 'Documentation'}
@@ -411,6 +412,12 @@ begin
 {$ELSE}
   p := Pointer(PByte(@Self.Flags) + 4);
 {$ENDIF CPUX64}
+
+{$IF (CompilerVersion >= 35)}  //Alexandria.
+  with Self do
+    p := Pointer(@FRegisteredStyles);
+{$IFEND}
+
   LRegisteredStyles := TDictionary<string, TSourceInfo>(p^);
 {$IFEND}
   for t in LRegisteredStyles do
@@ -1499,7 +1506,7 @@ begin
   Style.DrawElement(Canvas.Handle, LDetails, CaptionRect);
 
 {
-  //Draw Panel
+  // Draw Panel
   LDetails := Style.GetElementDetails(tpPageDontCare);
   PanelRect.Left:=7;
   PanelRect.Top:=ARect.Height-142;
@@ -1508,7 +1515,7 @@ begin
   Style.DrawElement(Canvas.Handle, LDetails, PanelRect);
   Style.GetElementColor(LDetails, ecTextColor, ThemeTextColor);
 }
-  //Draw Label
+  // Draw Label
   LDetails := Style.GetElementDetails(ttlTextLabelNormal);
   LabelRect.Left:=18;
   LabelRect.Top:=ARect.Height-130;
@@ -1518,7 +1525,7 @@ begin
   Style.GetElementColor(LDetails, ecTextColor, ThemeTextColor);
   Style.DrawText(Canvas.Handle, LDetails, 'Select install path:', LabelRect, TTextFormatFlags(DT_LEFT or DT_WORDBREAK), ThemeTextColor);
 
-  //Draw Edit
+  // Draw Edit
   LDetails := Style.GetElementDetails(teEditTextNormal);
   EditRect.Left:=16;
   EditRect.Top:=ARect.Height-114;
@@ -1528,7 +1535,7 @@ begin
   Style.GetElementColor(LDetails, ecTextColor, ThemeTextColor);
   Style.DrawText(Canvas.Handle, LDetails, ' C:\Program Files\My Program', EditRect, TTextFormatFlags(DT_LEFT or DT_VCENTER), ThemeTextColor);
 
-  //Draw [...] button
+  // Draw [...] button
   LDetails := Style.GetElementDetails(tbPushButtonNormal);
   ButtonRect.Left:=ARect.Width-43;
   ButtonRect.Top:=ARect.Height-114;
@@ -1538,7 +1545,7 @@ begin
   Style.GetElementColor(LDetails, ecTextColor, ThemeTextColor);
   Style.DrawText(Canvas.Handle, LDetails, '...', ButtonRect, TTextFormatFlags(DT_VCENTER or DT_CENTER), ThemeTextColor);
 
-  //Draw CheckBox
+  // Draw CheckBox
   LDetails := Style.GetElementDetails(tbCheckBoxCheckedNormal);
   CheckBoxRect.Left:=16;
   CheckBoxRect.Top:=ARect.Height-86;
@@ -1548,7 +1555,7 @@ begin
   Style.GetElementColor(LDetails, ecTextColor, ThemeTextColor);
   Style.DrawText(Canvas.Handle, LDetails, '       Install for All users', CheckBoxRect, [tfLeft, tfSingleLine, tfVerticalCenter], ThemeTextColor);
 
-  //Draw CheckBox
+  // Draw CheckBox
   LDetails := Style.GetElementDetails(tbCheckBoxUncheckedNormal);
   CheckBoxRect.Left:=16;
   CheckBoxRect.Top:=ARect.Height-68;
@@ -1558,28 +1565,27 @@ begin
   Style.GetElementColor(LDetails, ecTextColor, ThemeTextColor);
   Style.DrawText(Canvas.Handle, LDetails, '       Install for only current user', CheckBoxRect, [tfLeft, tfSingleLine, tfVerticalCenter], ThemeTextColor);
 
-  //Draw Next > button
+  // Draw Next > button
   LDetails := Style.GetElementDetails(tbPushButtonHot);
   ButtonRect.Left:=ARect.Width-170;
   ButtonRect.Top:=ARect.Height-35;
   ButtonRect.Width:=75;
   ButtonRect.Height:=23;
   Style.DrawElement(Canvas.Handle, LDetails, ButtonRect);
-
   Style.GetElementColor(LDetails, ecTextColor, ThemeTextColor);
   Style.DrawText(Canvas.Handle, LDetails, '&Next >', ButtonRect, TTextFormatFlags(DT_VCENTER or DT_CENTER), ThemeTextColor);
 
-  //Draw Cancel button
+  // Draw Cancel button
   LDetails := Style.GetElementDetails(tbPushButtonNormal);
   ButtonRect.Left:=ARect.Width-90;
   ButtonRect.Top:=ARect.Height-35;
   ButtonRect.Width:=75;
   ButtonRect.Height:=23;
   Style.DrawElement(Canvas.Handle, LDetails, ButtonRect);
-
   Style.GetElementColor(LDetails, ecTextColor, ThemeTextColor);
   Style.DrawText(Canvas.Handle, LDetails, 'Cancel', ButtonRect, TTextFormatFlags(DT_VCENTER or DT_CENTER), ThemeTextColor);
 end;
+
 
 { TVclStylePreview }
 
@@ -1725,9 +1731,11 @@ begin
       TextRect.Right := ButtonRect.Left;
 
     // Draw text
+    {$IF RTLVersion > 28}
     if Assigned(Application.Mainform) then
       CaptionBitmap.Canvas.Font.Size := Round(8*Application.MainForm.Monitor.PixelsPerInch / 96)
     else
+    {$IFEND}
       CaptionBitmap.Canvas.Font.Size := Round(8*Screen.PixelsPerInch / 96);
     Style.DrawText(CaptionBitmap.Canvas.Handle, CaptionDetails, FCaption, TextRect,
       [tfLeft, tfSingleLine, tfVerticalCenter]);
@@ -1754,9 +1762,11 @@ begin
   LDetails := Style.GetElementDetails(twFrameBottomActive);
   DrawStyleElement(FBitmap.Canvas.Handle, LDetails, CaptionRect, True, FStyle);
 
+  {$IF RTLVersion > 28}
   if Assigned(Application.Mainform) then
     FBitmap.Canvas.Font.Size := Round(8 * Application.MainForm.Monitor.PixelsPerInch / Screen.PixelsPerInch)
   else
+  {$IFEND}
     FBitmap.Canvas.Font.Size := 8;
 
   // Draw Main Menu
@@ -1802,12 +1812,14 @@ begin
   for i := 1 to 3 do
   begin
     ButtonRect.Top := LRect.Top + 30;
+    {$IF RTLVersion > 28}
     if Assigned(Application.Mainform) then
     begin
       ButtonRect.Width := Round(65 * Application.MainForm.Monitor.PixelsPerInch / 96);
       ButtonRect.Height := Round(25 * Application.MainForm.Monitor.PixelsPerInch / 96);
     end
     else
+    {$IFEND}
     begin
       ButtonRect.Width := Round(65 * Screen.PixelsPerInch / 96);
       ButtonRect.Height := Round(25 * Screen.PixelsPerInch / 96);
@@ -1824,12 +1836,14 @@ begin
   LDetails := Style.GetElementDetails(tbPushButtonNormal);
   ButtonRect.Left := BorderRect.Left + 2;
   ButtonRect.Top := ARect.Height - 45;
+  {$IF RTLVersion > 28}
   if Assigned(Application.Mainform) then
   begin
     ButtonRect.Width := Round(65 * Application.MainForm.Monitor.PixelsPerInch / 96);
     ButtonRect.Height := Round(25 * Application.MainForm.Monitor.PixelsPerInch / 96);
   end
   else
+  {$IFEND}
   begin
     ButtonRect.Width := Round(65 * Screen.PixelsPerInch / 96);
     ButtonRect.Height := Round(25 * Screen.PixelsPerInch / 96);
@@ -1844,12 +1858,14 @@ begin
   LDetails := Style.GetElementDetails(tbPushButtonHot);
   ButtonRect.Left := ButtonRect.Right + 2;
   ButtonRect.Top := ARect.Height - 45;
+  {$IF RTLVersion > 28}
   if Assigned(Application.Mainform) then
   begin
     ButtonRect.Width := Round(65 * Application.MainForm.Monitor.PixelsPerInch / 96);
     ButtonRect.Height := Round(25 * Application.MainForm.Monitor.PixelsPerInch / 96);
   end
   else
+  {$IFEND}
   begin
     ButtonRect.Width := Round(65 * Screen.PixelsPerInch / 96);
     ButtonRect.Height := Round(25 * Screen.PixelsPerInch / 96);
@@ -1864,12 +1880,14 @@ begin
   LDetails := Style.GetElementDetails(tbPushButtonPressed);
   ButtonRect.Left := ButtonRect.Right + 2;
   ButtonRect.Top := ARect.Height - 45;
+  {$IF RTLVersion > 28}
   if Assigned(Application.Mainform) then
   begin
     ButtonRect.Width := Round(65 * Application.MainForm.Monitor.PixelsPerInch / 96);
     ButtonRect.Height := Round(25 * Application.MainForm.Monitor.PixelsPerInch / 96);
   end
   else
+  {$IFEND}
   begin
     ButtonRect.Width := Round(65 * Screen.PixelsPerInch / 96);
     ButtonRect.Height := Round(25 * Screen.PixelsPerInch / 96);
@@ -1884,12 +1902,14 @@ begin
   LDetails := Style.GetElementDetails(tbPushButtonDisabled);
   ButtonRect.Left := ButtonRect.Right + 2;
   ButtonRect.Top := ARect.Height - 45;
+  {$IF RTLVersion > 28}
   if Assigned(Application.Mainform) then
   begin
     ButtonRect.Width := Round(65 * Application.MainForm.Monitor.PixelsPerInch / 96);
     ButtonRect.Height := Round(25 * Application.MainForm.Monitor.PixelsPerInch / 96);
   end
   else
+  {$IFEND}
   begin
     ButtonRect.Width := Round(65 * Screen.PixelsPerInch / 96);
     ButtonRect.Height := Round(25 * Screen.PixelsPerInch / 96);

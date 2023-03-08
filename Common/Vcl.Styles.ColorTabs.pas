@@ -15,7 +15,7 @@
 // The Original Code is Vcl.Styles.ColorTabs
 //
 // The Initial Developer of the Original Code is Rodrigo Ruz V.
-// Portions created by Rodrigo Ruz V. are Copyright (C) 2012-2020 Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2012-2023 Rodrigo Ruz V.
 // All Rights Reserved.
 //
 // **************************************************************************************************
@@ -84,7 +84,7 @@ type
   End;
 
 class function TCustomStyleEngineHelper.GetRegisteredStyleHooks
-  : TStyleHookDictionary;
+: TStyleHookDictionary;
 {$IF (CompilerVersion >=31)}
 var
   p: Pointer;

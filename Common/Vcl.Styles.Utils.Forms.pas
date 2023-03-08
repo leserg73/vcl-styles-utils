@@ -14,7 +14,7 @@
 //
 //
 // Portions created by Mahdi Safsafi [SMP3]   e-mail SMP@LIVE.FR
-// Portions created by Rodrigo Ruz V. are Copyright (C) 2013-2020 Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2013-2023 Rodrigo Ruz V.
 // All Rights Reserved.
 //
 // **************************************************************************************************
@@ -100,8 +100,8 @@ type
     function IsHorzScrollDisabled: Boolean;
     function IsVertScrollDisabled: Boolean;
   protected
-    property LstPos : Integer read FLstPos write FLstPos;
-    property AllowScrolling : Boolean read FAllowScrolling write FAllowScrolling;
+    property LstPos: Integer read FLstPos write FLstPos;
+    property AllowScrolling: Boolean read FAllowScrolling write FAllowScrolling;
     function NormalizePoint(const P: TPoint): TPoint;
     procedure Scroll(const Kind: TScrollBarKind; const ScrollType: TSysScrollingType; Pos, Delta: Integer); virtual;
     procedure DoScroll(const Kind: TScrollBarKind; const ScrollType: TSysScrollingType; Pos, Delta: Integer);
@@ -1107,14 +1107,10 @@ begin
   begin
     Inc(TextRect.Left, R.Left);
     MoveWindowOrg(Canvas.Handle, 0, TextTopOffset);
-    {$IF (CompilerVersion >= 33)}
     if Assigned(Application.Mainform) then
-      StyleServices.DrawText(Canvas.Handle, CaptionDetails, LText, TextRect, TextFormat, clRed, Application.MainForm.Monitor.PixelsPerInch)
+      StyleServices.DrawText(Canvas.Handle, CaptionDetails, LText, TextRect, TextFormat, clRed{$IF RTLVersion > 32}, Application.MainForm.Monitor.PixelsPerInch{$IFEND})
     else
-      StyleServices.DrawText(Canvas.Handle, CaptionDetails, LText, TextRect, TextFormat, clRed, Screen.PixelsPerInch);
-    {$ELSE}
-    StyleServices.DrawText(Canvas.Handle, CaptionDetails, LText, TextRect, TextFormat);
-    {$ENDIF}
+      StyleServices.DrawText(Canvas.Handle, CaptionDetails, LText, TextRect, TextFormat, clRed{$IF RTLVersion > 32}, Screen.PixelsPerInch{$IFEND});
     MoveWindowOrg(Canvas.Handle, 0, -TextTopOffset);
   end
   else
@@ -1361,7 +1357,7 @@ end;
 procedure TSysDialogStyleHook.WMSetText(var Message: TMessage);
 var
   FRedraw: Boolean;
-  LBorderStyle : TFormBorderStyle;
+  LBorderStyle: TFormBorderStyle;
 begin
   LBorderStyle := BorderStyle;
   if (LBorderStyle = bsNone) or (WindowState = wsMinimized) or (StyleServices.IsSystemStyle) then
@@ -1406,7 +1402,7 @@ end;
 
 procedure TSysDialogStyleHook.WndProc(var Message: TMessage);
 var
-  DFBW{,DX}: Integer;
+  DFBW,DX: Integer;
   LBorderSize: TRect;
   LParentHandle: HWND;
 begin
@@ -1418,16 +1414,24 @@ begin
         FSysCloseButtonDisabled := IsSysCloseButtonDisabled;
       end;
 
-    WM_CREATE:
+    WM_SHOWWINDOW:
       begin
         Message.Result := CallDefaultProc(Message);
         { DFBW =Default Frame Border Width }
-        DFBW := GetSysMetrics(SM_CXBORDER);
-        Inc(DFBW);
+        DFBW := GetSysMetrics(SM_CXSIZEFRAME) * 2;
+        //Inc(DFBW);
         LBorderSize := GetBorderSize;
-        if (SysControl.Width > LBorderSize.Left) and (SysControl.Width > LBorderSize.Right) then
-          SetWindowPos(Handle, 0, 0, 0, SysControl.Width + DFBW, SysControl.Height + DFBW + 1, SWP_NOMOVE or SWP_NOZORDER or SWP_FRAMECHANGED);
-        Exit;
+        DX := LBorderSize.Left + LBorderSize.Right - 2*DFBW;
+
+        // Adjust the window size if the vcl style border is smaller or larger
+        // than the default frame border is.
+
+        if (DFBW <> LBorderSize.Left) then
+          SetWindowPos(Handle, 0, 0, 0, SysControl.Width + DX, SysControl.Height + DX + 1, SWP_NOMOVE or SWP_NOZORDER or SWP_FRAMECHANGED);
+
+        // This code was moved from WM_CREATE: to be able to change TaskDialog, ColorDialog... sizes.
+        // E.g. the TaskDialog size is changed after creation to fit controls added to it. So in
+        // order to change its size - we need to do it here.
       end;
 
     WM_DESTROY:
@@ -1483,9 +1487,8 @@ begin
     Handled := False;
     Exit;
   end;
-  P.X := Longint(Word(Message.WParam));
-  P.Y := Longint(HiWord(Message.WParam));
-  GetCursorPos(P);
+  P.X := Int16(Message.LParam and $0000FFFF);
+  P.Y := Int16(Message.LParam shr 16);
   if FScrollKind = sbVertical then
   begin
     if (P.Y >= 0) then
@@ -1567,7 +1570,7 @@ begin
   GetCursorPos(P);
   if (FPrevPoint <> P) and (FDownPoint <> P) then
   begin
-    SendMessage(Handle, CM_SCROLLTRACKING, MakeWParam(P.X, P.Y), 0);
+    SendMessage(Handle, CM_SCROLLTRACKING, 0, PointToLParam(P));
     FPrevPoint := P;
     FDownPoint := Point(-1, -1);
   end;

@@ -15,7 +15,7 @@
 // The Original Code is Vcl.Styles.UxTheme.pas.
 //
 // The Initial Developer of the Original Code is Rodrigo Ruz V.
-// Portions created by Rodrigo Ruz V. are Copyright (C) 2013-2020 Rodrigo Ruz V.
+// Portions created by Rodrigo Ruz V. are Copyright (C) 2013-2023 Rodrigo Ruz V.
 // All Rights Reserved.
 //
 // **************************************************************************************************
@@ -72,9 +72,11 @@ uses
   Vcl.Themes,
   Vcl.Imaging.pngimage,
   Vcl.Styles.Utils.Graphics,
+{$IFDEF INNO_SETUP}
   {$IF Defined(HOOK_DateTimePicker) or Defined(HOOK_Menu) or Defined(HOOK_SearchBox) or Defined(HOOK_Navigation)}
   Vcl.Styles.FontAwesome,
   {$ENDIF}
+{$ENDIF INNO_SETUP}
   Vcl.Styles.Utils.SysControls,
   Vcl.Styles.Utils.Misc;
 
@@ -128,11 +130,13 @@ const
   VSCLASS_BREADCRUMBAR = 'BreadcrumbBar';
 {$ENDIF}
 
+{$IFDEF INNO_SETUP}
 {$IFDEF HOOK_Navigation}
 const
   VSCLASS_NAVIGATION = 'Navigation';
   VSCLASS_COMMONITEMSDIALOG = 'CommonItemsDialog';
 {$ENDIF}
+{$ENDIF INNO_SETUP}
 
 {$IFDEF HOOK_TreeView}
 const
@@ -152,32 +156,36 @@ const
   MARLETT_MAXIMIZE_CHAR = Char(49);
 {$ENDIF}
 
+{$IFDEF HOOK_ExplorerStatusBar}
+  VSCLASS_EXPLORERSTATUSBAR = 'ExplorerStatusBar';
+{$IFEND}
+
 type
   TDrawThemeBackground = function(hTheme: hTheme; hdc: hdc; iPartId, iStateId: Integer; const pRect: TRect; Foo: Pointer): HRESULT; stdcall;
-  TFuncDrawThemeBackground  =  function(hTheme: HTHEME; hdc: HDC; iPartId, iStateId: Integer; const pRect: TRect; Foo: Pointer; Trampoline : TDrawThemeBackground; LThemeClass : string; hwnd : HWND): HRESULT; stdcall;
+  TFuncDrawThemeBackground  =  function(hTheme: HTHEME; hdc: HDC; iPartId, iStateId: Integer; const pRect: TRect; Foo: Pointer; Trampoline: TDrawThemeBackground; LThemeClass: string; hwnd: HWND): HRESULT; stdcall;
 
 var
-  Trampoline_UxTheme_OpenThemeDataEx       : function(hwnd: HWND; pszClassList: LPCWSTR; dwFlags: DWORD): HTHEME; stdcall = nil;
-  Trampoline_UxTheme_OpenThemeData         : function(hwnd: HWND; pszClassList: LPCWSTR): HTHEME; stdcall =  nil;
+  Trampoline_UxTheme_OpenThemeDataEx: function(hwnd: HWND; pszClassList: LPCWSTR; dwFlags: DWORD): HTHEME; stdcall = nil;
+  Trampoline_UxTheme_OpenThemeData: function(hwnd: HWND; pszClassList: LPCWSTR): HTHEME; stdcall =  nil;
 {$IF CompilerVersion >= 30}
-  Trampoline_UxTheme_OpenThemeDataForDPI   : function(hwnd: HWND; pszClassList: LPCWSTR; dpi: UINT): HTHEME; stdcall =  nil;
+  Trampoline_UxTheme_OpenThemeDataForDPI: function(hwnd: HWND; pszClassList: LPCWSTR; dpi: UINT): HTHEME; stdcall =  nil;
 {$IFEND}
-  Trampoline_UxTheme_CloseThemeData        : function(hTheme: HTHEME): HRESULT; stdcall =  nil;
-  Trampoline_UxTheme_DrawThemeBackground   : function(hTheme: HTHEME; hdc: HDC; iPartId, iStateId: Integer; const pRect: TRect; pClipRect: Pointer): HRESULT; stdcall =  nil;
-  Trampoline_UxTheme_DrawThemeBackgroundEx : function(hTheme: HTHEME; hdc: HDC; iPartId, iStateId: Integer; const pRect: TRect; pOptions: Pointer): HResult; stdcall =  nil;
-  Trampoline_UxTheme_GetThemeColor         : function(hTheme: HTHEME; iPartId, iStateId, iPropId: Integer; var pColor: COLORREF): HRESULT; stdcall = nil;
-  Trampoline_UxTheme_GetThemeSysColor      : function(hTheme: HTHEME; iColorId: Integer): COLORREF; stdcall =  nil;
-  Trampoline_UxTheme_GetThemeSysColorBrush : function(hTheme: HTHEME; iColorId: Integer): HBRUSH; stdcall =  nil;
-  Trampoline_UxTheme_DrawThemeText         : function(hTheme: HTHEME; hdc: HDC; iPartId, iStateId: Integer;  pszText: LPCWSTR; iCharCount: Integer; dwTextFlags, dwTextFlags2: DWORD; const pRect: TRect): HRESULT; stdcall = nil;
-  Trampoline_UxTheme_DrawThemeTextEx       : function(hTheme: HTHEME; hdc: HDC; iPartId: Integer; iStateId: Integer; pszText: LPCWSTR; cchText: Integer; dwTextFlags: DWORD; pRect: PRect; var pOptions: TDTTOpts): HResult; stdcall = nil;
-  Trampoline_UxTheme_DrawThemeEdge         : function(hTheme: HTHEME; hdc: HDC; iPartId, iStateId: Integer; const pDestRect: TRect; uEdge, uFlags: UINT; pContentRect: PRECT): HRESULT; stdcall = nil;
+  Trampoline_UxTheme_CloseThemeData: function(hTheme: HTHEME): HRESULT; stdcall =  nil;
+  Trampoline_UxTheme_DrawThemeBackground: function(hTheme: HTHEME; hdc: HDC; iPartId, iStateId: Integer; const pRect: TRect; pClipRect: Pointer): HRESULT; stdcall =  nil;
+  Trampoline_UxTheme_DrawThemeBackgroundEx: function(hTheme: HTHEME; hdc: HDC; iPartId, iStateId: Integer; const pRect: TRect; pOptions: Pointer): HResult; stdcall =  nil;
+  Trampoline_UxTheme_GetThemeColor: function(hTheme: HTHEME; iPartId, iStateId, iPropId: Integer; var pColor: COLORREF): HRESULT; stdcall = nil;
+  Trampoline_UxTheme_GetThemeSysColor: function(hTheme: HTHEME; iColorId: Integer): COLORREF; stdcall =  nil;
+  Trampoline_UxTheme_GetThemeSysColorBrush: function(hTheme: HTHEME; iColorId: Integer): HBRUSH; stdcall =  nil;
+  Trampoline_UxTheme_DrawThemeText: function(hTheme: HTHEME; hdc: HDC; iPartId, iStateId: Integer;  pszText: LPCWSTR; iCharCount: Integer; dwTextFlags, dwTextFlags2: DWORD; const pRect: TRect): HRESULT; stdcall = nil;
+  Trampoline_UxTheme_DrawThemeTextEx: function(hTheme: HTHEME; hdc: HDC; iPartId: Integer; iStateId: Integer; pszText: LPCWSTR; cchText: Integer; dwTextFlags: DWORD; pRect: PRect; var pOptions: TDTTOpts): HResult; stdcall = nil;
+  Trampoline_UxTheme_DrawThemeEdge: function(hTheme: HTHEME; hdc: HDC; iPartId, iStateId: Integer; const pDestRect: TRect; uEdge, uFlags: UINT; pContentRect: PRECT): HRESULT; stdcall = nil;
 
-  THThemesClasses  : TDictionary<HTHEME, string>;
-  THThemesHWND     : TDictionary<HTHEME, HWND>;
+  THThemesClasses: TDictionary<HTHEME, string>;
+  THThemesHWND: TDictionary<HTHEME, HWND>;
 
-  FuncsDrawThemeBackground  : TDictionary<string, TFuncDrawThemeBackground>;
+  FuncsDrawThemeBackground: TDictionary<string, TFuncDrawThemeBackground>;
 
-  VCLStylesLock    : TCriticalSection = nil;
+  VCLStylesLock: TCriticalSection = nil;
 
 { Helper methods }
 
@@ -228,6 +236,7 @@ begin
     CloseThemeData(hThemeNew);
   {$ENDIF}
 
+{$IFDEF INNO_SETUP}
   {$IFDEF HOOK_Navigation}
   hThemeNew := Trampoline_UxTheme_OpenThemeData(0, VSCLASS_NAVIGATION);
   if hThemeNew = hTheme then
@@ -235,6 +244,7 @@ begin
   else
     CloseThemeData(hThemeNew);
   {$ENDIF}
+{$ENDIF INNO_SETUP}
 
   {$IFDEF HOOK_CommandModule}
   hThemeNew := Trampoline_UxTheme_OpenThemeData(0, VSCLASS_COMMANDMODULE);
@@ -530,7 +540,7 @@ end;
   Doesn't affect Compressed files font color (blue)
 }
 
-function Detour_UxTheme_GetThemeColor(hTheme: hTheme; iPartId, iStateId, iPropId: Integer; var pColor: COLORREF) : HRESULT; stdcall;
+function Detour_UxTheme_GetThemeColor(hTheme: hTheme; iPartId, iStateId, iPropId: Integer; var pColor: COLORREF): HRESULT; stdcall;
 var
   LThemeClass: string;
 begin
@@ -598,17 +608,13 @@ begin
     begin
       pColor := clNone;
       case iPartId of
-
         0:
           case iStateId of
-            0:
-              pColor := ColorToRGB(StyleServices.GetSystemColor(clWindowText));
+            0: pColor := ColorToRGB(StyleServices.GetSystemColor(clWindowText));
           end;
-
         1:
           case iStateId of
-            1:
-              pColor := ColorToRGB(StyleServices.GetSystemColor(clWindowText));
+            1: pColor := ColorToRGB(StyleServices.GetSystemColor(clWindowText));
           end;
       end;
 
@@ -628,8 +634,7 @@ begin
       case iPartId of
         1:
           case iStateId of
-            2:
-              pColor := ColorToRGB(StyleServices.GetSystemColor(clWindowText));
+            2: pColor := ColorToRGB(StyleServices.GetSystemColor(clWindowText));
           end;
       end;
 
@@ -650,13 +655,11 @@ begin
       case iPartId of
         TTP_STANDARD:
           case iStateId of
-            0:
-              pColor := ColorToRGB(StyleServices.GetSystemColor(clBtnText));
+            0: pColor := ColorToRGB(StyleServices.GetSystemColor(clBtnText));
           end;
         4:
           case iStateId of
-            0:
-              pColor := ColorToRGB(StyleServices.GetSystemColor(clHighlight));
+            0: pColor := ColorToRGB(StyleServices.GetSystemColor(clHighlight));
           end;
       end;
 
@@ -677,8 +680,8 @@ begin
       case iPartId of
         9:
           case iStateId  of
-            1 :  pColor := ColorToRGB(StyleServices.GetSystemColor(clWindow));
-            2 :  pColor := ColorToRGB(StyleServices.GetSystemColor(clHighlight));
+            1: pColor := ColorToRGB(StyleServices.GetSystemColor(clWindow));
+            2: pColor := ColorToRGB(StyleServices.GetSystemColor(clHighlight));
           end;
       end;
 
@@ -699,7 +702,7 @@ begin
       case iPartId of
         13:
           case iStateId  of
-            0 : pColor := ColorToRGB(StyleServices.GetSystemColor(clBtnFace));
+            0: pColor := ColorToRGB(StyleServices.GetSystemColor(clBtnFace));
           end;
       end;
 
@@ -721,7 +724,7 @@ begin
       case iPartId of
         11:
           case iStateId  of
-            0 : pColor := ColorToRGB(StyleServices.GetStyleColor(scPanel));
+            0: pColor := ColorToRGB(StyleServices.GetStyleColor(scPanel));
           end;
       end;
 
@@ -742,8 +745,7 @@ begin
 
         TEXT_MAININSTRUCTION:
           case iStateId of
-            0:
-                pColor := ColorToRGB(StyleServices.GetSystemColor(clHighlightText));
+            0: pColor := ColorToRGB(StyleServices.GetSystemColor(clHighlightText));
           end;
       end;
 
@@ -764,8 +766,7 @@ begin
 
         HP_HEADERITEM:
           case iStateId of
-            0:
-              pColor := ColorToRGB(StyleServices.GetSystemColor(clBtnText));
+            0: pColor := ColorToRGB(StyleServices.GetSystemColor(clBtnText));
           end;
 
       end;
@@ -788,14 +789,12 @@ begin
 
         1: // preview background
           case iStateId of
-            0:
-              pColor := ColorToRGB(StyleServices.GetSystemColor(clWindow));
+            0: pColor := ColorToRGB(StyleServices.GetSystemColor(clWindow));
           end;
 
         2: // preview text
           case iStateId of
-            0:
-              pColor := ColorToRGB(StyleServices.GetSystemColor(clWindowText));
+            0: pColor := ColorToRGB(StyleServices.GetSystemColor(clWindowText));
           end;
       end;
 
@@ -811,39 +810,27 @@ begin
     begin
       pColor := clNone;
       case iPartId of
-
         5:
           case iStateId of
-            0:
-              ColorToRGB(StyleServices.GetSystemColor(clHighlight));
+            0: ColorToRGB(StyleServices.GetSystemColor(clHighlight));
           end;
-
         6:
           case iStateId of
-            0:
-              pColor := ColorToRGB(StyleServices.GetSystemColor(clBtnText));
+            0: pColor := ColorToRGB(StyleServices.GetSystemColor(clBtnText));
           end;
-
         7:
           case iStateId of
-            1:
-              pColor := GetStyleHighLightColor();
-            2:
-              pColor := ColorToRGB(clGreen);
+            1: pColor := GetStyleHighLightColor();
+            2: pColor := ColorToRGB(clGreen);
           end;
-
         8:
           case iStateId of
-            0:
-              pColor := ColorToRGB(clRed);
+            0: pColor := ColorToRGB(clRed);
           end;
-
         9:
           case iStateId of
-            1:
-              pColor := ColorToRGB(clBlue);
-            2:
-              pColor := ColorToRGB(clYellow);
+            1: pColor := ColorToRGB(clBlue);
+            2: pColor := ColorToRGB(clYellow);
           end;
       end;
 
@@ -905,8 +892,7 @@ begin
       case iPartId of
         0, 2:
           case iStateId of
-            0:
-              pColor := ColorToRGB(StyleServices.GetSystemColor(clWindow)); // OK
+            0: pColor := ColorToRGB(StyleServices.GetSystemColor(clWindow)); // OK
           end;
       end;
 
@@ -930,51 +916,38 @@ begin
       case iPartId of
         0:
           case iStateId of
-            0:
-              pColor := ColorToRGB(StyleServices.GetSystemColor(clWindow));
+            0: pColor := ColorToRGB(StyleServices.GetSystemColor(clWindow));
           end;
 
         LVP_LISTITEM:
           case iStateId of
-            0:
-              pColor := ColorToRGB(clRed);
+            0: pColor := ColorToRGB(clRed);
           end;
 
         LVP_LISTSORTEDDETAIL:
           case iStateId of
-            1:
-              pColor := ColorToRGB(StyleServices.GetSystemColor(clWindowText));
+            1: pColor := ColorToRGB(StyleServices.GetSystemColor(clWindowText));
             // normal main column (name)
-            2:
-              pColor := ColorToRGB(clWindowText);
-
+            2: pColor := ColorToRGB(clWindowText);
             // SELECTED
-            3:
-              pColor := ColorToRGB(StyleServices.GetSystemColor(clWindowText));
+            3: pColor := ColorToRGB(StyleServices.GetSystemColor(clWindowText));
 
             // hot text
-            4:
-              pColor := ColorToRGB(StyleServices.GetSystemColor(clWindowText));
-            5:
-              pColor := ColorToRGB(clBlue);
-            6:
-              pColor := ColorToRGB(clYellow);
-            7:
-              pColor := ColorToRGB(clGreen);
-            8:
-              pColor := ColorToRGB(clFuchsia);
+            4: pColor := ColorToRGB(StyleServices.GetSystemColor(clWindowText));
+            5: pColor := ColorToRGB(clBlue);
+            6: pColor := ColorToRGB(clYellow);
+            7: pColor := ColorToRGB(clGreen);
+            8: pColor := ColorToRGB(clFuchsia);
           end;
 
         LVP_EMPTYTEXT:
           case iStateId of
-            0:
-              pColor := ColorToRGB(StyleServices.GetSystemColor(clHighlight));
+            0: pColor := ColorToRGB(StyleServices.GetSystemColor(clHighlight));
           end;
 
         LVP_GROUPHEADER:
           case iStateId of
-            0:
-              pColor := ColorToRGB(StyleServices.GetSystemColor(clWindowText));
+            0: pColor := ColorToRGB(StyleServices.GetSystemColor(clWindowText));
           end;
       end;
 
@@ -998,45 +971,54 @@ begin
         // button with dropdown
         3:
           case iStateId of
-            1:
-              pColor := ColorToRGB(GetStyleBtnTextColor); // GetStyleHighLightColor;
-            6:
-              pColor := ColorToRGB(clYellow); // StyleServices.GetSystemColor(clBtnShadow);
+            1: pColor := ColorToRGB(GetStyleBtnTextColor); // GetStyleHighLightColor;
+            6: pColor := ColorToRGB(clYellow); // StyleServices.GetSystemColor(clBtnShadow);
           end;
-
         4:
           case iStateId of
-            1:
-              pColor := ColorToRGB(GetStyleBtnTextColor);
+            1: pColor := ColorToRGB(GetStyleBtnTextColor);
           end;
 
         9:
           case iStateId of
-            1:
-              pColor := ColorToRGB(GetStyleBtnTextColor);
+            1: pColor := ColorToRGB(GetStyleBtnTextColor);
               // ColorToRGB(StyleServices.GetSystemColor(clBtnText));
             // Highlight
-            2:
-              pColor := ColorToRGB(GetStyleBtnTextColor);
+            2: pColor := ColorToRGB(GetStyleBtnTextColor);
               // ColorToRGB(StyleServices.GetSystemColor(clBtnText)); //OK
-            3:
-              pColor := ColorToRGB(GetStyleBtnTextColor);
+            3: pColor := ColorToRGB(GetStyleBtnTextColor);
               // ColorToRGB(StyleServices.GetSystemColor(clBtnText)); //OK
-            6:
-              pColor := ColorToRGB(clLime); // StyleServices.GetSystemColor(clBtnShadow);
+            6: pColor := ColorToRGB(clLime); // StyleServices.GetSystemColor(clBtnShadow);
           end;
 
         // header text
         10:
           case iStateId of
-            1:
-              pColor := ColorToRGB(GetStyleHighLightColor);
+            1: pColor := ColorToRGB(GetStyleHighLightColor);
           end;
       end;
 
       Result := S_OK;
       // if pColor=clNone then
       // OutputDebugString(PChar(Format('Detour_GetThemeColor Class %s hTheme %d iPartId %d iStateId %d  iPropId %d Color %8.x', [LThemeClass, hTheme, iPartId, iStateId, iPropId, pColor])));
+    end
+    else
+    {$ENDIF}
+    {$IFDEF HOOK_EXPLORERSTATUSBAR}
+    if SameText(LThemeClass, VSCLASS_EXPLORERSTATUSBAR) then
+    begin
+      pColor := clNone;
+      if (iPartId = 0) and (iStateId = 0) then
+      begin
+        pColor := ColorToRGB(StyleServices.GetSystemColor(clWindow));
+      end;
+      if TColor(pColor) = clNone then
+      begin
+        // OutputDebugString(PChar(Format('Detour_GetThemeColor Class %s hTheme %d iPartId %d iStateId %d  iPropId %d Color %8.x', [LThemeClass, hTheme, iPartId, iStateId, iPropId, pColor])));
+        Result := Trampoline_UxTheme_GetThemeColor(hTheme, iPartId, iStateId, iPropId, pColor);
+      end
+      else
+        Result := S_OK;
     end
     else
     {$ENDIF}
@@ -1177,16 +1159,12 @@ begin
             SaveIndex := SaveDC(hdc);
             try
               case iStateId of
-                MPI_NORMAL:
-                  LDetails := StyleServices.GetElementDetails(tmPopupItemNormal);
-                MPI_HOT:
-                  LDetails := StyleServices.GetElementDetails(tmPopupItemHot);
-                // MPI_PUSHED         : LDetails := StyleServices.GetElementDetails(tmMenuBarItemPushed);
-                MPI_DISABLED:
-                  LDetails := StyleServices.GetElementDetails(tmPopupItemDisabled);
-                MPI_DISABLEDHOT:
-                  LDetails := StyleServices.GetElementDetails(tmPopupItemDisabledHot);
-                // MPI_DISABLEDPUSHED : LDetails := StyleServices.GetElementDetails(tmMenuBarItemDisabledPushed);
+                MPI_NORMAL: LDetails := StyleServices.GetElementDetails(tmPopupItemNormal);
+                MPI_HOT: LDetails := StyleServices.GetElementDetails(tmPopupItemHot);
+                // MPI_PUSHED: LDetails := StyleServices.GetElementDetails(tmMenuBarItemPushed);
+                MPI_DISABLED: LDetails := StyleServices.GetElementDetails(tmPopupItemDisabled);
+                MPI_DISABLEDHOT: LDetails := StyleServices.GetElementDetails(tmPopupItemDisabledHot);
+                // MPI_DISABLEDPUSHED: LDetails := StyleServices.GetElementDetails(tmMenuBarItemDisabledPushed);
               else
                 LDetails := StyleServices.GetElementDetails(tmPopupItemNormal);
               end;
@@ -1207,18 +1185,12 @@ begin
             SaveIndex := SaveDC(hdc);
             try
               case iStateId of
-                MBI_NORMAL:
-                  LDetails := StyleServices.GetElementDetails(tmPopupItemNormal);
-                MBI_HOT:
-                  LDetails := StyleServices.GetElementDetails(tmMenuBarItemHot);
-                MBI_PUSHED:
-                  LDetails := StyleServices.GetElementDetails(tmMenuBarItemPushed);
-                MBI_DISABLED:
-                  LDetails := StyleServices.GetElementDetails(tmMenuBarItemDisabled);
-                MBI_DISABLEDHOT:
-                  LDetails := StyleServices.GetElementDetails(tmMenuBarItemDisabledHot);
-                MBI_DISABLEDPUSHED:
-                  LDetails := StyleServices.GetElementDetails(tmMenuBarItemDisabledPushed);
+                MBI_NORMAL: LDetails := StyleServices.GetElementDetails(tmPopupItemNormal);
+                MBI_HOT: LDetails := StyleServices.GetElementDetails(tmMenuBarItemHot);
+                MBI_PUSHED: LDetails := StyleServices.GetElementDetails(tmMenuBarItemPushed);
+                MBI_DISABLED: LDetails := StyleServices.GetElementDetails(tmMenuBarItemDisabled);
+                MBI_DISABLEDHOT:  LDetails := StyleServices.GetElementDetails(tmMenuBarItemDisabledHot);
+                MBI_DISABLEDPUSHED: LDetails := StyleServices.GetElementDetails(tmMenuBarItemDisabledPushed);
               end;
 
               LRect := pRect;
@@ -1280,11 +1252,11 @@ begin
         MC_TRAILINGGRIDCELLUPPER, MC_GRIDCELLUPPER, MC_GRIDCELL:
           begin
             // case iStateId of
-            // MCGCB_SELECTED           :   LDetails := StyleServices.GetElementDetails(tgCellSelected);
-            // MCGCB_HOT                :   LDetails := StyleServices.GetElementDetails(tgFixedCellHot);
-            // MCGCB_SELECTEDHOT        :   LDetails := StyleServices.GetElementDetails(tgCellSelected);
-            // MCGCB_SELECTEDNOTFOCUSED :   LDetails := StyleServices.GetElementDetails(tgCellSelected);
-            // MCGCB_TODAY              :   LDetails := StyleServices.GetElementDetails(tgFixedCellHot);
+            // MCGCB_SELECTED:   LDetails := StyleServices.GetElementDetails(tgCellSelected);
+            // MCGCB_HOT:   LDetails := StyleServices.GetElementDetails(tgFixedCellHot);
+            // MCGCB_SELECTEDHOT:   LDetails := StyleServices.GetElementDetails(tgCellSelected);
+            // MCGCB_SELECTEDNOTFOCUSED:   LDetails := StyleServices.GetElementDetails(tgCellSelected);
+            // MCGCB_TODAY:   LDetails := StyleServices.GetElementDetails(tgFixedCellHot);
             // else
             // LDetails := StyleServices.GetElementDetails(tgCellNormal);
             // end;
@@ -1326,14 +1298,10 @@ begin
         MC_TRAILINGGRIDCELL:
           begin
             case iStateId of
-              MCTGC_HOT:
-                LDetails := StyleServices.GetElementDetails(tgFixedCellHot);
-              MCTGC_HASSTATE:
-                LDetails := StyleServices.GetElementDetails(tgCellSelected);
-              MCTGC_HASSTATEHOT:
-                LDetails := StyleServices.GetElementDetails(tgCellSelected);
-              MCTGC_TODAY:
-                LDetails := StyleServices.GetElementDetails(tgFixedCellHot);
+              MCTGC_HOT: LDetails := StyleServices.GetElementDetails(tgFixedCellHot);
+              MCTGC_HASSTATE: LDetails := StyleServices.GetElementDetails(tgCellSelected);
+              MCTGC_HASSTATEHOT: LDetails := StyleServices.GetElementDetails(tgCellSelected);
+              MCTGC_TODAY: LDetails := StyleServices.GetElementDetails(tgFixedCellHot);
             else
               LDetails := StyleServices.GetElementDetails(teEditTextDisabled);
             end;
@@ -1384,18 +1352,12 @@ begin
         BP_PUSHBUTTON:
           begin
             case iStateId of
-              PBS_NORMAL:
-                LDetails := StyleServices.GetElementDetails(tbPushButtonNormal);
-              PBS_HOT:
-                LDetails := StyleServices.GetElementDetails(tbPushButtonHot);
-              PBS_PRESSED:
-                LDetails := StyleServices.GetElementDetails(tbPushButtonPressed);
-              PBS_DISABLED:
-                LDetails := StyleServices.GetElementDetails(tbPushButtonDisabled);
-              PBS_DEFAULTED:
-                LDetails := StyleServices.GetElementDetails(tbPushButtonDefaulted);
-              PBS_DEFAULTED_ANIMATING:
-                LDetails := StyleServices.GetElementDetails(tbPushButtonDefaultedAnimating);
+              PBS_NORMAL: LDetails := StyleServices.GetElementDetails(tbPushButtonNormal);
+              PBS_HOT: LDetails := StyleServices.GetElementDetails(tbPushButtonHot);
+              PBS_PRESSED: LDetails := StyleServices.GetElementDetails(tbPushButtonPressed);
+              PBS_DISABLED: LDetails := StyleServices.GetElementDetails(tbPushButtonDisabled);
+              PBS_DEFAULTED: LDetails := StyleServices.GetElementDetails(tbPushButtonDefaulted);
+              PBS_DEFAULTED_ANIMATING: LDetails := StyleServices.GetElementDetails(tbPushButtonDefaultedAnimating);
             end;
 
             // StyleServices.DrawText(hdc,  LDetails, string(pszText), pRect, dwTextFlags, dwTextFlags2);
@@ -1411,22 +1373,14 @@ begin
         BP_RADIOBUTTON:
           begin
             case iStateId of
-              RBS_UNCHECKEDNORMAL:
-                LDetails := StyleServices.GetElementDetails(tbRadioButtonUncheckedNormal);
-              RBS_UNCHECKEDHOT:
-                LDetails := StyleServices.GetElementDetails(tbRadioButtonUncheckedHot);
-              RBS_UNCHECKEDPRESSED:
-                LDetails := StyleServices.GetElementDetails(tbRadioButtonUncheckedPressed);
-              RBS_UNCHECKEDDISABLED:
-                LDetails := StyleServices.GetElementDetails(tbRadioButtonUncheckedDisabled);
-              RBS_CHECKEDNORMAL:
-                LDetails := StyleServices.GetElementDetails(tbRadioButtonCheckedNormal);
-              RBS_CHECKEDHOT:
-                LDetails := StyleServices.GetElementDetails(tbRadioButtonCheckedHot);
-              RBS_CHECKEDPRESSED:
-                LDetails := StyleServices.GetElementDetails(tbRadioButtonCheckedPressed);
-              RBS_CHECKEDDISABLED:
-                LDetails := StyleServices.GetElementDetails(tbRadioButtonCheckedDisabled);
+              RBS_UNCHECKEDNORMAL: LDetails := StyleServices.GetElementDetails(tbRadioButtonUncheckedNormal);
+              RBS_UNCHECKEDHOT: LDetails := StyleServices.GetElementDetails(tbRadioButtonUncheckedHot);
+              RBS_UNCHECKEDPRESSED: LDetails := StyleServices.GetElementDetails(tbRadioButtonUncheckedPressed);
+              RBS_UNCHECKEDDISABLED: LDetails := StyleServices.GetElementDetails(tbRadioButtonUncheckedDisabled);
+              RBS_CHECKEDNORMAL: LDetails := StyleServices.GetElementDetails(tbRadioButtonCheckedNormal);
+              RBS_CHECKEDHOT: LDetails := StyleServices.GetElementDetails(tbRadioButtonCheckedHot);
+              RBS_CHECKEDPRESSED: LDetails := StyleServices.GetElementDetails(tbRadioButtonCheckedPressed);
+              RBS_CHECKEDDISABLED: LDetails := StyleServices.GetElementDetails(tbRadioButtonCheckedDisabled);
             end;
 
             if not StyleServices.GetElementColor(LDetails, ecTextColor, ThemeTextColor) then
@@ -1441,18 +1395,12 @@ begin
           begin
 
             case iStateId of
-              CMDLS_NORMAL:
-                LDetails := StyleServices.GetElementDetails(tbPushButtonNormal);
-              CMDLS_HOT:
-                LDetails := StyleServices.GetElementDetails(tbPushButtonHot);
-              CMDLS_PRESSED:
-                LDetails := StyleServices.GetElementDetails(tbPushButtonPressed);
-              CMDLS_DISABLED:
-                LDetails := StyleServices.GetElementDetails(tbPushButtonDisabled);
-              CMDLS_DEFAULTED:
-                LDetails := StyleServices.GetElementDetails(tbPushButtonDefaulted);
-              CMDLS_DEFAULTED_ANIMATING:
-                LDetails := StyleServices.GetElementDetails(tbPushButtonDefaultedAnimating);
+              CMDLS_NORMAL: LDetails := StyleServices.GetElementDetails(tbPushButtonNormal);
+              CMDLS_HOT: LDetails := StyleServices.GetElementDetails(tbPushButtonHot);
+              CMDLS_PRESSED: LDetails := StyleServices.GetElementDetails(tbPushButtonPressed);
+              CMDLS_DISABLED: LDetails := StyleServices.GetElementDetails(tbPushButtonDisabled);
+              CMDLS_DEFAULTED: LDetails := StyleServices.GetElementDetails(tbPushButtonDefaulted);
+              CMDLS_DEFAULTED_ANIMATING: LDetails := StyleServices.GetElementDetails(tbPushButtonDefaultedAnimating);
             end;
 
             LCanvas := TCanvas.Create;
@@ -1635,18 +1583,12 @@ begin
       BP_COMMANDLINK:
         begin
           case iStateId of
-            CMDLS_NORMAL:
-              LDetails := StyleServices.GetElementDetails(tbPushButtonNormal);
-            CMDLS_HOT:
-              LDetails := StyleServices.GetElementDetails(tbPushButtonHot);
-            CMDLS_PRESSED:
-              LDetails := StyleServices.GetElementDetails(tbPushButtonPressed);
-            CMDLS_DISABLED:
-              LDetails := StyleServices.GetElementDetails(tbPushButtonDisabled);
-            CMDLS_DEFAULTED:
-              LDetails := StyleServices.GetElementDetails(tbPushButtonDefaulted);
-            CMDLS_DEFAULTED_ANIMATING:
-              LDetails := StyleServices.GetElementDetails(tbPushButtonDefaultedAnimating);
+            CMDLS_NORMAL: LDetails := StyleServices.GetElementDetails(tbPushButtonNormal);
+            CMDLS_HOT: LDetails := StyleServices.GetElementDetails(tbPushButtonHot);
+            CMDLS_PRESSED: LDetails := StyleServices.GetElementDetails(tbPushButtonPressed);
+            CMDLS_DISABLED: LDetails := StyleServices.GetElementDetails(tbPushButtonDisabled);
+            CMDLS_DEFAULTED: LDetails := StyleServices.GetElementDetails(tbPushButtonDefaulted);
+            CMDLS_DEFAULTED_ANIMATING: LDetails := StyleServices.GetElementDetails(tbPushButtonDefaultedAnimating);
           end;
 
           if not StyleServices.GetElementColor(LDetails, ecTextColor, ThemeTextColor) then
@@ -1967,12 +1909,9 @@ begin
     LVP_EXPANDBUTTON:
       begin
         case iStateId of
-          LVEB_NORMAL:
-            LDetails := StyleServices.GetElementDetails(tcpThemedChevronOpenedNormal);
-          LVEB_HOVER:
-            LDetails := StyleServices.GetElementDetails(tcpThemedChevronOpenedHot);
-          LVEB_PUSHED:
-            LDetails := StyleServices.GetElementDetails(tcpThemedChevronOpenedPressed);
+          LVEB_NORMAL: LDetails := StyleServices.GetElementDetails(tcpThemedChevronOpenedNormal);
+          LVEB_HOVER: LDetails := StyleServices.GetElementDetails(tcpThemedChevronOpenedHot);
+          LVEB_PUSHED: LDetails := StyleServices.GetElementDetails(tcpThemedChevronOpenedPressed);
         else
           LDetails := StyleServices.GetElementDetails(tcpThemedChevronOpenedNormal);
         end;
@@ -1991,12 +1930,9 @@ begin
     LVP_COLLAPSEBUTTON:
       begin
         case iStateId of
-          LVCB_NORMAL:
-            LDetails := StyleServices.GetElementDetails(tcpThemedChevronClosedNormal);
-          LVCB_HOVER:
-            LDetails := StyleServices.GetElementDetails(tcpThemedChevronClosedHot);
-          LVCB_PUSHED:
-            LDetails := StyleServices.GetElementDetails(tcpThemedChevronClosedPressed);
+          LVCB_NORMAL: LDetails := StyleServices.GetElementDetails(tcpThemedChevronClosedNormal);
+          LVCB_HOVER: LDetails := StyleServices.GetElementDetails(tcpThemedChevronClosedHot);
+          LVCB_PUSHED: LDetails := StyleServices.GetElementDetails(tcpThemedChevronClosedPressed);
         else
           LDetails := StyleServices.GetElementDetails(tcpThemedChevronClosedNormal);
         end;
@@ -2123,33 +2059,18 @@ begin
     HP_HEADERITEM:
       begin
         case iStateId of
-          HIS_NORMAL:
-            LDetails := StyleServices.GetElementDetails(thHeaderItemNormal);
-          HIS_HOT:
-            LDetails := StyleServices.GetElementDetails(thHeaderItemHot);
-          HIS_PRESSED:
-            LDetails := StyleServices.GetElementDetails(thHeaderItemPressed);
-
-          HIS_SORTEDNORMAL:
-            LDetails := StyleServices.GetElementDetails(thHeaderItemNormal);
-          HIS_SORTEDHOT:
-            LDetails := StyleServices.GetElementDetails(thHeaderItemHot);
-          HIS_SORTEDPRESSED:
-            LDetails := StyleServices.GetElementDetails(thHeaderItemPressed);
-
-          HIS_ICONNORMAL:
-            LDetails := StyleServices.GetElementDetails(thHeaderItemNormal);
-          HIS_ICONHOT:
-            LDetails := StyleServices.GetElementDetails(thHeaderItemHot);
-          HIS_ICONPRESSED:
-            LDetails := StyleServices.GetElementDetails(thHeaderItemPressed);
-
-          HIS_ICONSORTEDNORMAL:
-            LDetails := StyleServices.GetElementDetails(thHeaderItemNormal);
-          HIS_ICONSORTEDHOT:
-            LDetails := StyleServices.GetElementDetails(thHeaderItemHot);
-          HIS_ICONSORTEDPRESSED:
-            LDetails := StyleServices.GetElementDetails(thHeaderItemPressed);
+          HIS_NORMAL: LDetails := StyleServices.GetElementDetails(thHeaderItemNormal);
+          HIS_HOT: LDetails := StyleServices.GetElementDetails(thHeaderItemHot);
+          HIS_PRESSED: LDetails := StyleServices.GetElementDetails(thHeaderItemPressed);
+          HIS_SORTEDNORMAL: LDetails := StyleServices.GetElementDetails(thHeaderItemNormal);
+          HIS_SORTEDHOT: LDetails := StyleServices.GetElementDetails(thHeaderItemHot);
+          HIS_SORTEDPRESSED: LDetails := StyleServices.GetElementDetails(thHeaderItemPressed);
+          HIS_ICONNORMAL: LDetails := StyleServices.GetElementDetails(thHeaderItemNormal);
+          HIS_ICONHOT: LDetails := StyleServices.GetElementDetails(thHeaderItemHot);
+          HIS_ICONPRESSED: LDetails := StyleServices.GetElementDetails(thHeaderItemPressed);
+          HIS_ICONSORTEDNORMAL: LDetails := StyleServices.GetElementDetails(thHeaderItemNormal);
+          HIS_ICONSORTEDHOT: LDetails := StyleServices.GetElementDetails(thHeaderItemHot);
+          HIS_ICONSORTEDPRESSED: LDetails := StyleServices.GetElementDetails(thHeaderItemPressed);
         else
           LDetails := StyleServices.GetElementDetails(thHeaderItemNormal);
         end;
@@ -2169,8 +2090,8 @@ begin
     HP_HEADERSORTARROW:
       begin
         // case iStateId of
-        // HSAS_SORTEDUP    : LDetails := StyleServices.GetElementDetails(thHeaderSortArrowSortedUp);
-        // HSAS_SORTEDDOWN  : LDetails := StyleServices.GetElementDetails(thHeaderSortArrowSortedDown);
+        // HSAS_SORTEDUP: LDetails := StyleServices.GetElementDetails(thHeaderSortArrowSortedUp);
+        // HSAS_SORTEDDOWN: LDetails := StyleServices.GetElementDetails(thHeaderSortArrowSortedDown);
         // end;
 
         LColor := GetStyleHighLightColor();
@@ -2187,14 +2108,11 @@ begin
     HP_HEADERDROPDOWN:
       begin
         case iStateId of
-          HDDS_NORMAL:
-            LDetails := StyleServices.GetElementDetails(ttbSplitButtonDropDownNormal);
+          HDDS_NORMAL: LDetails := StyleServices.GetElementDetails(ttbSplitButtonDropDownNormal);
             // tcDropDownButtonNormal, thHeaderDropDownNormal
-          HDDS_SOFTHOT:
-            LDetails := StyleServices.GetElementDetails(ttbSplitButtonDropDownHot);
+          HDDS_SOFTHOT: LDetails := StyleServices.GetElementDetails(ttbSplitButtonDropDownHot);
             // tcDropDownButtonHot, thHeaderDropDownSoftHot
-          HDDS_HOT:
-            LDetails := StyleServices.GetElementDetails(ttbSplitButtonDropDownHot);
+          HDDS_HOT: LDetails := StyleServices.GetElementDetails(ttbSplitButtonDropDownHot);
             // tcDropDownButtonHot, thHeaderDropDownHot
         end;
 
@@ -2205,14 +2123,11 @@ begin
     HP_HEADERDROPDOWNFILTER:
       begin
         case iStateId of
-          HDDFS_NORMAL:
-            LDetails := StyleServices.GetElementDetails(ttbSplitButtonDropDownNormal);
+          HDDFS_NORMAL: LDetails := StyleServices.GetElementDetails(ttbSplitButtonDropDownNormal);
             // tcDropDownButtonNormal, thHeaderDropDownNormal
-          HDDFS_SOFTHOT:
-            LDetails := StyleServices.GetElementDetails(ttbSplitButtonDropDownHot);
+          HDDFS_SOFTHOT: LDetails := StyleServices.GetElementDetails(ttbSplitButtonDropDownHot);
             // tcDropDownButtonHot, thHeaderDropDownSoftHot
-          HDDFS_HOT:
-            LDetails := StyleServices.GetElementDetails(ttbSplitButtonDropDownHot);
+          HDDFS_HOT: LDetails := StyleServices.GetElementDetails(ttbSplitButtonDropDownHot);
             // tcDropDownButtonHot, thHeaderDropDownHot
         end;
 
@@ -2395,12 +2310,10 @@ begin
     0:
       begin
         case iStateId of
-
           0:
             begin
               if (hwnd <> 0) then
                 DrawStyleParentBackground(hwnd, hdc, pRect);
-
               LDetails.Element := teToolBar;
               LDetails.Part := 0;
               LDetails.State := 0;
@@ -2409,7 +2322,6 @@ begin
               DrawStyleElement(hdc, StyleServices.GetElementDetails(tmPopupBackground), pRect);
               exit(S_OK);
             end;
-
         end;
       end;
 
@@ -2655,6 +2567,7 @@ begin
     // end;
 
     // Magnifier
+{$IFDEF INNO_SETUP}
     3:
       begin
         case iStateId of
@@ -2666,6 +2579,7 @@ begin
             end;
         end;
       end;
+{$ENDIF INNO_SETUP}
   end;
 
   // OutputDebugString(PChar(Format('UxTheme_SearchBox hTheme %d iPartId %d iStateId %d', [hTheme, iPartId, iStateId])));
@@ -2673,6 +2587,7 @@ begin
 end;
 {$ENDIF}
 
+{$IFDEF INNO_SETUP}
 {$IFDEF HOOK_DateTimePicker}
 function UxTheme_MonthCal(hTheme: hTheme; hdc: hdc; iPartId, iStateId: Integer; const pRect: TRect; Foo: Pointer;
   Trampoline: TDrawThemeBackground; LThemeClass: string; hwnd: hwnd = 0): HRESULT; stdcall;
@@ -2737,16 +2652,11 @@ begin
     MC_NAVNEXT:
       begin
         case iStateId of
-          MCNN_NORMAL:
-            LDetails := StyleServices.GetElementDetails(tsArrowBtnRightNormal);
-          MCNN_HOT:
-            LDetails := StyleServices.GetElementDetails(tsArrowBtnRightHot);
-          MCNN_PRESSED:
-            LDetails := StyleServices.GetElementDetails(tsArrowBtnRightPressed);
-          MCNN_DISABLED:
-            LDetails := StyleServices.GetElementDetails(tsArrowBtnRightDisabled);
+          MCNN_NORMAL: LDetails := StyleServices.GetElementDetails(tsArrowBtnRightNormal);
+          MCNN_HOT: LDetails := StyleServices.GetElementDetails(tsArrowBtnRightHot);
+          MCNN_PRESSED: LDetails := StyleServices.GetElementDetails(tsArrowBtnRightPressed);
+          MCNN_DISABLED: LDetails := StyleServices.GetElementDetails(tsArrowBtnRightDisabled);
         end;
-
         DrawStyleElement(hdc, LDetails, pRect);
         exit(S_OK);
       end;
@@ -2754,14 +2664,10 @@ begin
     MC_NAVPREV:
       begin
         case iStateId of
-          MCNP_NORMAL:
-            LDetails := StyleServices.GetElementDetails(tsArrowBtnLeftNormal);
-          MCNP_HOT:
-            LDetails := StyleServices.GetElementDetails(tsArrowBtnLeftHot);
-          MCNP_PRESSED:
-            LDetails := StyleServices.GetElementDetails(tsArrowBtnLeftPressed);
-          MCNP_DISABLED:
-            LDetails := StyleServices.GetElementDetails(tsArrowBtnLeftDisabled);
+          MCNP_NORMAL: LDetails := StyleServices.GetElementDetails(tsArrowBtnLeftNormal);
+          MCNP_HOT: LDetails := StyleServices.GetElementDetails(tsArrowBtnLeftHot);
+          MCNP_PRESSED: LDetails := StyleServices.GetElementDetails(tsArrowBtnLeftPressed);
+          MCNP_DISABLED: LDetails := StyleServices.GetElementDetails(tsArrowBtnLeftDisabled);
         end;
 
         DrawStyleElement(hdc, LDetails, pRect);
@@ -2784,14 +2690,10 @@ begin
     DP_DATEBORDER:
       begin
         case iStateId of
-          DPDB_NORMAL:
-            LDetails := StyleServices.GetElementDetails(teEditBorderNoScrollNormal);
-          DPDB_HOT:
-            LDetails := StyleServices.GetElementDetails(teEditBorderNoScrollHot);
-          DPDB_FOCUSED:
-            LDetails := StyleServices.GetElementDetails(teEditBorderNoScrollFocused);
-          DPDB_DISABLED:
-            LDetails := StyleServices.GetElementDetails(teEditBorderNoScrollDisabled);
+          DPDB_NORMAL: LDetails := StyleServices.GetElementDetails(teEditBorderNoScrollNormal);
+          DPDB_HOT: LDetails := StyleServices.GetElementDetails(teEditBorderNoScrollHot);
+          DPDB_FOCUSED: LDetails := StyleServices.GetElementDetails(teEditBorderNoScrollFocused);
+          DPDB_DISABLED: LDetails := StyleServices.GetElementDetails(teEditBorderNoScrollDisabled);
         end;
 
         DrawStyleElement(hdc, LDetails, pRect);
@@ -2802,14 +2704,10 @@ begin
       begin
 
         case iStateId of
-          DPSCBR_NORMAL:
-            LDetails := StyleServices.GetElementDetails(tcBorderNormal);
-          DPSCBR_HOT:
-            LDetails := StyleServices.GetElementDetails(tcBorderHot);
-          DPSCBR_PRESSED:
-            LDetails := StyleServices.GetElementDetails(tcBorderHot);
-          DPSCBR_DISABLED:
-            LDetails := StyleServices.GetElementDetails(tcBorderDisabled);
+          DPSCBR_NORMAL: LDetails := StyleServices.GetElementDetails(tcBorderNormal);
+          DPSCBR_HOT: LDetails := StyleServices.GetElementDetails(tcBorderHot);
+          DPSCBR_PRESSED: LDetails := StyleServices.GetElementDetails(tcBorderHot);
+          DPSCBR_DISABLED: LDetails := StyleServices.GetElementDetails(tcBorderDisabled);
         end;
 
         DrawStyleElement(hdc, LDetails, pRect);
@@ -2856,6 +2754,7 @@ begin
   exit(Trampoline(hTheme, hdc, iPartId, iStateId, pRect, Foo));
 end;
 {$ENDIF}
+{$ENDIF INNO_SETUP}
 
 {$IFDEF HOOK_ComboBox}
 function UxTheme_ComboBox(hTheme: hTheme; hdc: hdc; iPartId, iStateId: Integer; const pRect: TRect; Foo: Pointer;
@@ -2936,26 +2835,18 @@ begin
     SPNP_UP:
       begin
         case iStateId of
-          UPS_NORMAL:
-            LDetails := StyleServices.GetElementDetails(tsUpNormal);
-          UPS_HOT:
-            LDetails := StyleServices.GetElementDetails(tsUpHot);
-          UPS_PRESSED:
-            LDetails := StyleServices.GetElementDetails(tsUpPressed);
-          UPS_DISABLED:
-            LDetails := StyleServices.GetElementDetails(tsUpDisabled);
+          UPS_NORMAL: LDetails := StyleServices.GetElementDetails(tsUpNormal);
+          UPS_HOT: LDetails := StyleServices.GetElementDetails(tsUpHot);
+          UPS_PRESSED: LDetails := StyleServices.GetElementDetails(tsUpPressed);
+          UPS_DISABLED: LDetails := StyleServices.GetElementDetails(tsUpDisabled);
         end;
 
         LColor := StyleServices.GetStyleFontColor(TStyleFont.sfButtonTextNormal);
         case iStateId of
-          UPS_NORMAL:
-            LColor := StyleServices.GetStyleFontColor(TStyleFont.sfButtonTextNormal);
-          UPS_HOT:
-            LColor := StyleServices.GetStyleFontColor(TStyleFont.sfButtonTextHot);
-          UPS_PRESSED:
-            LColor := StyleServices.GetStyleFontColor(TStyleFont.sfButtonTextPressed);
-          UPS_DISABLED:
-            LColor := StyleServices.GetStyleFontColor(TStyleFont.sfButtonTextDisabled);
+          UPS_NORMAL: LColor := StyleServices.GetStyleFontColor(TStyleFont.sfButtonTextNormal);
+          UPS_HOT: LColor := StyleServices.GetStyleFontColor(TStyleFont.sfButtonTextHot);
+          UPS_PRESSED: LColor := StyleServices.GetStyleFontColor(TStyleFont.sfButtonTextPressed);
+          UPS_DISABLED: LColor := StyleServices.GetStyleFontColor(TStyleFont.sfButtonTextDisabled);
         end;
 
         DrawStyleElement(hdc, LDetails, pRect);
@@ -2963,35 +2854,25 @@ begin
         LRect.Top := LRect.Top + 3;
         LRect.Left := LRect.Left + 5;
         DrawStyleArrow(hdc, TScrollDirection.sdUp, LRect.Location, 2, LColor);
-
         exit(S_OK);
       end;
 
     SPNP_DOWN:
       begin
         case iStateId of
-          DNS_NORMAL:
-            LDetails := StyleServices.GetElementDetails(tsDownNormal);
-          DNS_HOT:
-            LDetails := StyleServices.GetElementDetails(tsDownHot);
-          DNS_PRESSED:
-            LDetails := StyleServices.GetElementDetails(tsDownPressed);
-          DNS_DISABLED:
-            LDetails := StyleServices.GetElementDetails(tsDownDisabled);
+          DNS_NORMAL: LDetails := StyleServices.GetElementDetails(tsDownNormal);
+          DNS_HOT: LDetails := StyleServices.GetElementDetails(tsDownHot);
+          DNS_PRESSED: LDetails := StyleServices.GetElementDetails(tsDownPressed);
+          DNS_DISABLED: LDetails := StyleServices.GetElementDetails(tsDownDisabled);
         end;
 
         LColor := StyleServices.GetStyleFontColor(TStyleFont.sfButtonTextNormal);
         case iStateId of
-          DNS_NORMAL:
-            LColor := StyleServices.GetStyleFontColor(TStyleFont.sfButtonTextNormal);
-          DNS_HOT:
-            LColor := StyleServices.GetStyleFontColor(TStyleFont.sfButtonTextHot);
-          DNS_PRESSED:
-            LColor := StyleServices.GetStyleFontColor(TStyleFont.sfButtonTextPressed);
-          DNS_DISABLED:
-            LColor := StyleServices.GetStyleFontColor(TStyleFont.sfButtonTextDisabled);
+          DNS_NORMAL: LColor := StyleServices.GetStyleFontColor(TStyleFont.sfButtonTextNormal);
+          DNS_HOT: LColor := StyleServices.GetStyleFontColor(TStyleFont.sfButtonTextHot);
+          DNS_PRESSED: LColor := StyleServices.GetStyleFontColor(TStyleFont.sfButtonTextPressed);
+          DNS_DISABLED: LColor := StyleServices.GetStyleFontColor(TStyleFont.sfButtonTextDisabled);
         end;
-
         DrawStyleElement(hdc, LDetails, pRect);
         LRect := pRect;
         LRect.Top := LRect.Top + 3;
@@ -3016,16 +2897,11 @@ begin
     LBCP_BORDER_NOSCROLL:
       begin
         case iStateId of
-          LBPSN_NORMAL:
-            LDetails := StyleServices.GetElementDetails(teEditBorderNoScrollNormal);
-          LBPSN_FOCUSED:
-            LDetails := StyleServices.GetElementDetails(teEditBorderNoScrollFocused);
-          LBPSN_HOT:
-            LDetails := StyleServices.GetElementDetails(teEditBorderNoScrollHot);
-          LBPSN_DISABLED:
-            LDetails := StyleServices.GetElementDetails(teEditBorderNoScrollDisabled);
+          LBPSN_NORMAL: LDetails := StyleServices.GetElementDetails(teEditBorderNoScrollNormal);
+          LBPSN_FOCUSED: LDetails := StyleServices.GetElementDetails(teEditBorderNoScrollFocused);
+          LBPSN_HOT: LDetails := StyleServices.GetElementDetails(teEditBorderNoScrollHot);
+          LBPSN_DISABLED: LDetails := StyleServices.GetElementDetails(teEditBorderNoScrollDisabled);
         end;
-
         DrawStyleElement(hdc, LDetails, pRect);
         exit(S_OK);
       end;
@@ -3036,6 +2912,7 @@ begin
 end;
 {$ENDIF}
 
+{$IFDEF INNO_SETUP}
 {$IFDEF HOOK_Navigation}
 function UxTheme_Navigation(hTheme: hTheme; hdc: hdc; iPartId, iStateId: Integer; const pRect: TRect; Foo: Pointer;
   Trampoline: TDrawThemeBackground; LThemeClass: string; hwnd: hwnd): HRESULT; stdcall;
@@ -3072,7 +2949,6 @@ begin
                 DrawStyleFillRect(LBitmap.Canvas.Handle, pRect, LColor);
 
                 case iStateId of
-
                   1:
                     begin
                       DrawStyleElement(LBitmap.Canvas.Handle, StyleServices.GetElementDetails(ttbButtonNormal), pRect);
@@ -3127,11 +3003,9 @@ begin
                   LCanvas.Handle := 0;
                   LCanvas.Free;
                 end;
-
               finally
                 LBitmap.Free;
               end;
-
               exit(S_OK);
             end;
         end;
@@ -3198,6 +3072,7 @@ begin
   exit(Trampoline(hTheme, hdc, iPartId, iStateId, pRect, Foo));
 end;
 {$ENDIF}
+{$ENDIF INNO_SETUP}
 
 {$IFDEF HOOK_TreeView}
 function UxTheme_TreeView(hTheme: hTheme; hdc: hdc; iPartId, iStateId: Integer; const pRect: TRect; Foo: Pointer;
@@ -3248,7 +3123,6 @@ begin
         end;
       end;
   end;
-
   // OutputDebugString(PChar(Format('UxTheme_TreeView  class %s hTheme %d iPartId %d iStateId %d', [THThemesClasses.Items[hTheme],hTheme, iPartId, iStateId])));
   exit(Trampoline(hTheme, hdc, iPartId, iStateId, pRect, Foo));
 end;
@@ -3271,18 +3145,12 @@ begin
     BP_PUSHBUTTON:
       begin
         case iStateId of
-          PBS_NORMAL:
-            LDetails := StyleServices.GetElementDetails(tbPushButtonNormal);
-          PBS_HOT:
-            LDetails := StyleServices.GetElementDetails(tbPushButtonHot);
-          PBS_PRESSED:
-            LDetails := StyleServices.GetElementDetails(tbPushButtonPressed);
-          PBS_DISABLED:
-            LDetails := StyleServices.GetElementDetails(tbPushButtonDisabled);
-          PBS_DEFAULTED:
-            LDetails := StyleServices.GetElementDetails(tbPushButtonDefaulted);
-          PBS_DEFAULTED_ANIMATING:
-            LDetails := StyleServices.GetElementDetails(tbPushButtonDefaultedAnimating);
+          PBS_NORMAL: LDetails := StyleServices.GetElementDetails(tbPushButtonNormal);
+          PBS_HOT: LDetails := StyleServices.GetElementDetails(tbPushButtonHot);
+          PBS_PRESSED: LDetails := StyleServices.GetElementDetails(tbPushButtonPressed);
+          PBS_DISABLED: LDetails := StyleServices.GetElementDetails(tbPushButtonDisabled);
+          PBS_DEFAULTED: LDetails := StyleServices.GetElementDetails(tbPushButtonDefaulted);
+          PBS_DEFAULTED_ANIMATING: LDetails := StyleServices.GetElementDetails(tbPushButtonDefaultedAnimating);
         end;
         
         SaveIndex := SaveDC(hndc);
@@ -3318,18 +3186,12 @@ begin
       begin
 
         case iStateId of
-          CMDLS_NORMAL:
-            LDetails := StyleServices.GetElementDetails(tbPushButtonNormal);
-          CMDLS_HOT:
-            LDetails := StyleServices.GetElementDetails(tbPushButtonHot);
-          CMDLS_PRESSED:
-            LDetails := StyleServices.GetElementDetails(tbPushButtonPressed);
-          CMDLS_DISABLED:
-            LDetails := StyleServices.GetElementDetails(tbPushButtonDisabled);
-          CMDLS_DEFAULTED:
-            LDetails := StyleServices.GetElementDetails(tbPushButtonDefaulted);
-          CMDLS_DEFAULTED_ANIMATING:
-            LDetails := StyleServices.GetElementDetails(tbPushButtonDefaultedAnimating);
+          CMDLS_NORMAL: LDetails := StyleServices.GetElementDetails(tbPushButtonNormal);
+          CMDLS_HOT: LDetails := StyleServices.GetElementDetails(tbPushButtonHot);
+          CMDLS_PRESSED: LDetails := StyleServices.GetElementDetails(tbPushButtonPressed);
+          CMDLS_DISABLED: LDetails := StyleServices.GetElementDetails(tbPushButtonDisabled);
+          CMDLS_DEFAULTED: LDetails := StyleServices.GetElementDetails(tbPushButtonDefaulted);
+          CMDLS_DEFAULTED_ANIMATING: LDetails := StyleServices.GetElementDetails(tbPushButtonDefaultedAnimating);
         end;
 
         SaveIndex := SaveDC(hndc);
@@ -3364,16 +3226,11 @@ begin
     BP_COMMANDLINKGLYPH:
       begin
         case iStateId of
-          CMDLGS_NORMAL:
-            LDetails := StyleServices.GetElementDetails(tbCommandLinkGlyphNormal);
-          CMDLGS_HOT:
-            LDetails := StyleServices.GetElementDetails(tbCommandLinkGlyphHot);
-          CMDLGS_PRESSED:
-            LDetails := StyleServices.GetElementDetails(tbCommandLinkGlyphPressed);
-          CMDLGS_DISABLED:
-            LDetails := StyleServices.GetElementDetails(tbCommandLinkGlyphDisabled);
-          CMDLGS_DEFAULTED:
-            LDetails := StyleServices.GetElementDetails(tbCommandLinkGlyphDefaulted);
+          CMDLGS_NORMAL: LDetails := StyleServices.GetElementDetails(tbCommandLinkGlyphNormal);
+          CMDLGS_HOT: LDetails := StyleServices.GetElementDetails(tbCommandLinkGlyphHot);
+          CMDLGS_PRESSED: LDetails := StyleServices.GetElementDetails(tbCommandLinkGlyphPressed);
+          CMDLGS_DISABLED: LDetails := StyleServices.GetElementDetails(tbCommandLinkGlyphDisabled);
+          CMDLGS_DEFAULTED: LDetails := StyleServices.GetElementDetails(tbCommandLinkGlyphDefaulted);
         end;
 
         SaveIndex := SaveDC(hndc);
@@ -3391,22 +3248,14 @@ begin
     BP_RADIOBUTTON:
       begin
         case iStateId of
-          RBS_UNCHECKEDNORMAL:
-            LDetails := StyleServices.GetElementDetails(tbRadioButtonUncheckedNormal);
-          RBS_UNCHECKEDHOT:
-            LDetails := StyleServices.GetElementDetails(tbRadioButtonUncheckedHot);
-          RBS_UNCHECKEDPRESSED:
-            LDetails := StyleServices.GetElementDetails(tbRadioButtonUncheckedPressed);
-          RBS_UNCHECKEDDISABLED:
-            LDetails := StyleServices.GetElementDetails(tbRadioButtonUncheckedDisabled);
-          RBS_CHECKEDNORMAL:
-            LDetails := StyleServices.GetElementDetails(tbRadioButtonCheckedNormal);
-          RBS_CHECKEDHOT:
-            LDetails := StyleServices.GetElementDetails(tbRadioButtonCheckedHot);
-          RBS_CHECKEDPRESSED:
-            LDetails := StyleServices.GetElementDetails(tbRadioButtonCheckedPressed);
-          RBS_CHECKEDDISABLED:
-            LDetails := StyleServices.GetElementDetails(tbRadioButtonCheckedDisabled);
+          RBS_UNCHECKEDNORMAL: LDetails := StyleServices.GetElementDetails(tbRadioButtonUncheckedNormal);
+          RBS_UNCHECKEDHOT: LDetails := StyleServices.GetElementDetails(tbRadioButtonUncheckedHot);
+          RBS_UNCHECKEDPRESSED: LDetails := StyleServices.GetElementDetails(tbRadioButtonUncheckedPressed);
+          RBS_UNCHECKEDDISABLED: LDetails := StyleServices.GetElementDetails(tbRadioButtonUncheckedDisabled);
+          RBS_CHECKEDNORMAL: LDetails := StyleServices.GetElementDetails(tbRadioButtonCheckedNormal);
+          RBS_CHECKEDHOT: LDetails := StyleServices.GetElementDetails(tbRadioButtonCheckedHot);
+          RBS_CHECKEDPRESSED: LDetails := StyleServices.GetElementDetails(tbRadioButtonCheckedPressed);
+          RBS_CHECKEDDISABLED: LDetails := StyleServices.GetElementDetails(tbRadioButtonCheckedDisabled);
         end;
 
         DrawStyleElement(hndc, LDetails, pRect);
@@ -3416,47 +3265,27 @@ begin
     BP_CHECKBOX:
       begin
         case iStateId of
-          CBS_UNCHECKEDNORMAL:
-            LDetails := StyleServices.GetElementDetails(tbCheckBoxUncheckedNormal);
-          CBS_UNCHECKEDHOT:
-            LDetails := StyleServices.GetElementDetails(tbCheckBoxUncheckedHot);
-          CBS_UNCHECKEDPRESSED:
-            LDetails := StyleServices.GetElementDetails(tbCheckBoxUncheckedPressed);
-          CBS_UNCHECKEDDISABLED:
-            LDetails := StyleServices.GetElementDetails(tbCheckBoxUncheckedDisabled);
-          CBS_CHECKEDNORMAL:
-            LDetails := StyleServices.GetElementDetails(tbCheckBoxCheckedNormal);
-          CBS_CHECKEDHOT:
-            LDetails := StyleServices.GetElementDetails(tbCheckBoxCheckedHot);
-          CBS_CHECKEDPRESSED:
-            LDetails := StyleServices.GetElementDetails(tbCheckBoxCheckedPressed);
-          CBS_CHECKEDDISABLED:
-            LDetails := StyleServices.GetElementDetails(tbCheckBoxCheckedDisabled);
-          CBS_MIXEDNORMAL:
-            LDetails := StyleServices.GetElementDetails(tbCheckBoxMixedNormal);
-          CBS_MIXEDHOT:
-            LDetails := StyleServices.GetElementDetails(tbCheckBoxMixedHot);
-          CBS_MIXEDPRESSED:
-            LDetails := StyleServices.GetElementDetails(tbCheckBoxMixedPressed);
-          CBS_MIXEDDISABLED:
-            LDetails := StyleServices.GetElementDetails(tbCheckBoxMixedDisabled);
+          CBS_UNCHECKEDNORMAL: LDetails := StyleServices.GetElementDetails(tbCheckBoxUncheckedNormal);
+          CBS_UNCHECKEDHOT: LDetails := StyleServices.GetElementDetails(tbCheckBoxUncheckedHot);
+          CBS_UNCHECKEDPRESSED: LDetails := StyleServices.GetElementDetails(tbCheckBoxUncheckedPressed);
+          CBS_UNCHECKEDDISABLED: LDetails := StyleServices.GetElementDetails(tbCheckBoxUncheckedDisabled);
+          CBS_CHECKEDNORMAL: LDetails := StyleServices.GetElementDetails(tbCheckBoxCheckedNormal);
+          CBS_CHECKEDHOT: LDetails := StyleServices.GetElementDetails(tbCheckBoxCheckedHot);
+          CBS_CHECKEDPRESSED: LDetails := StyleServices.GetElementDetails(tbCheckBoxCheckedPressed);
+          CBS_CHECKEDDISABLED: LDetails := StyleServices.GetElementDetails(tbCheckBoxCheckedDisabled);
+          CBS_MIXEDNORMAL: LDetails := StyleServices.GetElementDetails(tbCheckBoxMixedNormal);
+          CBS_MIXEDHOT: LDetails := StyleServices.GetElementDetails(tbCheckBoxMixedHot);
+          CBS_MIXEDPRESSED: LDetails := StyleServices.GetElementDetails(tbCheckBoxMixedPressed);
+          CBS_MIXEDDISABLED: LDetails := StyleServices.GetElementDetails(tbCheckBoxMixedDisabled);
           { For Windows >= Vista }
-          CBS_IMPLICITNORMAL:
-            LDetails := StyleServices.GetElementDetails(tbCheckBoxImplicitNormal);
-          CBS_IMPLICITHOT:
-            LDetails := StyleServices.GetElementDetails(tbCheckBoxImplicitHot);
-          CBS_IMPLICITPRESSED:
-            LDetails := StyleServices.GetElementDetails(tbCheckBoxImplicitPressed);
-          CBS_IMPLICITDISABLED:
-            LDetails := StyleServices.GetElementDetails(tbCheckBoxImplicitDisabled);
-          CBS_EXCLUDEDNORMAL:
-            LDetails := StyleServices.GetElementDetails(tbCheckBoxExcludedNormal);
-          CBS_EXCLUDEDHOT:
-            LDetails := StyleServices.GetElementDetails(tbCheckBoxExcludedHot);
-          CBS_EXCLUDEDPRESSED:
-            LDetails := StyleServices.GetElementDetails(tbCheckBoxExcludedPressed);
-          CBS_EXCLUDEDDISABLED:
-            LDetails := StyleServices.GetElementDetails(tbCheckBoxExcludedDisabled);
+          CBS_IMPLICITNORMAL: LDetails := StyleServices.GetElementDetails(tbCheckBoxImplicitNormal);
+          CBS_IMPLICITHOT: LDetails := StyleServices.GetElementDetails(tbCheckBoxImplicitHot);
+          CBS_IMPLICITPRESSED: LDetails := StyleServices.GetElementDetails(tbCheckBoxImplicitPressed);
+          CBS_IMPLICITDISABLED: LDetails := StyleServices.GetElementDetails(tbCheckBoxImplicitDisabled);
+          CBS_EXCLUDEDNORMAL: LDetails := StyleServices.GetElementDetails(tbCheckBoxExcludedNormal);
+          CBS_EXCLUDEDHOT: LDetails := StyleServices.GetElementDetails(tbCheckBoxExcludedHot);
+          CBS_EXCLUDEDPRESSED: LDetails := StyleServices.GetElementDetails(tbCheckBoxExcludedPressed);
+          CBS_EXCLUDEDDISABLED: LDetails := StyleServices.GetElementDetails(tbCheckBoxExcludedDisabled);
         end;
 
         DrawStyleElement(hndc, LDetails, pRect);
@@ -3483,7 +3312,6 @@ begin
     TDLG_PRIMARYPANEL:
       begin
         // LDetails := StyleServices.GetElementDetails(ttdPrimaryPanel);   //ttdPrimaryPanel  this element is not included in the VCL Styles yet
-
         LColor := StyleServices.GetStyleColor(scEdit);
         if LColor = StyleServices.GetStyleColor(scBorder) then
           LColor := StyleServices.GetStyleColor(scPanel); // GetShadowColor(LColor, -10);
@@ -3502,18 +3330,12 @@ begin
     TDLG_EXPANDOBUTTON:
       begin
         case iStateId of
-          TDLGEBS_NORMAL:
-            LDetails := StyleServices.GetElementDetails(tcpThemedChevronClosedNormal);
-          TDLGEBS_HOVER:
-            LDetails := StyleServices.GetElementDetails(tcpThemedChevronClosedHot);
-          TDLGEBS_PRESSED:
-            LDetails := StyleServices.GetElementDetails(tcpThemedChevronClosedPressed);
-          TDLGEBS_EXPANDEDNORMAL:
-            LDetails := StyleServices.GetElementDetails(tcpThemedChevronOpenedNormal);
-          TDLGEBS_EXPANDEDHOVER:
-            LDetails := StyleServices.GetElementDetails(tcpThemedChevronOpenedHot);
-          TDLGEBS_EXPANDEDPRESSED:
-            LDetails := StyleServices.GetElementDetails(tcpThemedChevronOpenedPressed);
+          TDLGEBS_NORMAL: LDetails := StyleServices.GetElementDetails(tcpThemedChevronClosedNormal);
+          TDLGEBS_HOVER: LDetails := StyleServices.GetElementDetails(tcpThemedChevronClosedHot);
+          TDLGEBS_PRESSED: LDetails := StyleServices.GetElementDetails(tcpThemedChevronClosedPressed);
+          TDLGEBS_EXPANDEDNORMAL: LDetails := StyleServices.GetElementDetails(tcpThemedChevronOpenedNormal);
+          TDLGEBS_EXPANDEDHOVER: LDetails := StyleServices.GetElementDetails(tcpThemedChevronOpenedHot);
+          TDLGEBS_EXPANDEDPRESSED: LDetails := StyleServices.GetElementDetails(tcpThemedChevronOpenedPressed);
         end;
 
         SaveIndex := SaveDC(hdc);
@@ -3553,7 +3375,7 @@ begin
       end
   end;
 
-   OutputDebugString(PChar(Format('UxTheme_TaskDialog  class %s hTheme %d iPartId %d iStateId %d', [THThemesClasses.Items[hTheme],hTheme, iPartId, iStateId])));
+  // OutputDebugString(PChar(Format('UxTheme_TaskDialog  class %s hTheme %d iPartId %d iStateId %d', [THThemesClasses.Items[hTheme],hTheme, iPartId, iStateId])));
   exit(Trampoline(hTheme, hdc, iPartId, iStateId, pRect, Foo));
 end;
 {$ENDIF}
@@ -3566,14 +3388,10 @@ var
   SaveIndex: Integer;
 begin
   case iPartId of
-    PP_BAR:
-      LDetails := StyleServices.GetElementDetails(tpBar);
-    PP_BARVERT:
-      LDetails := StyleServices.GetElementDetails(tpBarVert);
-    PP_CHUNK:
-      LDetails := StyleServices.GetElementDetails(tpChunk);
-    PP_CHUNKVERT:
-      LDetails := StyleServices.GetElementDetails(tpChunkVert);
+    PP_BAR: LDetails := StyleServices.GetElementDetails(tpBar);
+    PP_BARVERT: LDetails := StyleServices.GetElementDetails(tpBarVert);
+    PP_CHUNK: LDetails := StyleServices.GetElementDetails(tpChunk);
+    PP_CHUNKVERT: LDetails := StyleServices.GetElementDetails(tpChunkVert);
 
     PP_FILL:
       if SameText(LThemeClass, VSCLASS_PROGRESS) then
@@ -3585,7 +3403,7 @@ begin
       LDetails := StyleServices.GetElementDetails(tpChunkVert); // GetElementDetails(tpFillVert); not defined
 
     // Use the Native PP_PULSEOVERLAY part to get better results.
-    // PP_PULSEOVERLAY : if SameText(THThemesClasses.Items[hTheme], VSCLASS_PROGRESS) then
+    // PP_PULSEOVERLAY: if SameText(THThemesClasses.Items[hTheme], VSCLASS_PROGRESS) then
     // LDetails := StyleServices.GetElementDetails(tpChunk)//GetElementDetails(tpPulseOverlay);
     // else
     // LDetails := StyleServices.GetElementDetails(tpBar);
@@ -3596,8 +3414,8 @@ begin
       else
         LDetails := StyleServices.GetElementDetails(tpChunk);
 
-    // PP_PULSEOVERLAYVERT :   LDetails := StyleServices.GetElementDetails(tpPulseOverlayVert);
-    // PP_MOVEOVERLAYVERT  :   LDetails := StyleServices.GetElementDetails(tpMoveOverlayVert);
+    // PP_PULSEOVERLAYVERT:   LDetails := StyleServices.GetElementDetails(tpPulseOverlayVert);
+    // PP_MOVEOVERLAYVERT:   LDetails := StyleServices.GetElementDetails(tpMoveOverlayVert);
 
     PP_TRANSPARENTBAR:
       LDetails := StyleServices.GetElementDetails(tpBar); // GetElementDetails(tpTransparentBarNormal); not defined
@@ -3640,196 +3458,128 @@ begin
     SBP_ARROWBTN:
       begin
         case iStateId of
-          ABS_UPNORMAL:
-            LScrollDetails := tsArrowBtnUpNormal;
-          ABS_UPHOT:
-            LScrollDetails := tsArrowBtnUpHot;
-          ABS_UPPRESSED:
-            LScrollDetails := tsArrowBtnUpPressed;
-          ABS_UPDISABLED:
-            LScrollDetails := tsArrowBtnUpDisabled;
-          ABS_DOWNNORMAL:
-            LScrollDetails := tsArrowBtnDownNormal;
-          ABS_DOWNHOT:
-            LScrollDetails := tsArrowBtnDownHot;
-          ABS_DOWNPRESSED:
-            LScrollDetails := tsArrowBtnDownPressed;
-          ABS_DOWNDISABLED:
-            LScrollDetails := tsArrowBtnDownDisabled;
-          ABS_LEFTNORMAL:
-            LScrollDetails := tsArrowBtnLeftNormal;
-          ABS_LEFTHOT:
-            LScrollDetails := tsArrowBtnLeftHot;
-          ABS_LEFTPRESSED:
-            LScrollDetails := tsArrowBtnLeftPressed;
-          ABS_LEFTDISABLED:
-            LScrollDetails := tsArrowBtnLeftDisabled;
-          ABS_RIGHTNORMAL:
-            LScrollDetails := tsArrowBtnRightNormal;
-          ABS_RIGHTHOT:
-            LScrollDetails := tsArrowBtnRightHot;
-          ABS_RIGHTPRESSED:
-            LScrollDetails := tsArrowBtnRightPressed;
-          ABS_RIGHTDISABLED:
-            LScrollDetails := tsArrowBtnRightDisabled;
-          ABS_UPHOVER:
-            LScrollDetails := tsArrowBtnUpNormal; // tsArrowBtnUpHover;
-          ABS_DOWNHOVER:
-            LScrollDetails := tsArrowBtnDownNormal; // tsArrowBtnDownHover;
-          ABS_LEFTHOVER:
-            LScrollDetails := tsArrowBtnLeftNormal; // tsArrowBtnLeftHover;
-          ABS_RIGHTHOVER:
-            LScrollDetails := tsArrowBtnRightNormal; // tsArrowBtnRightHover;
+          ABS_UPNORMAL: LScrollDetails := tsArrowBtnUpNormal;
+          ABS_UPHOT: LScrollDetails := tsArrowBtnUpHot;
+          ABS_UPPRESSED: LScrollDetails := tsArrowBtnUpPressed;
+          ABS_UPDISABLED: LScrollDetails := tsArrowBtnUpDisabled;
+          ABS_DOWNNORMAL: LScrollDetails := tsArrowBtnDownNormal;
+          ABS_DOWNHOT: LScrollDetails := tsArrowBtnDownHot;
+          ABS_DOWNPRESSED: LScrollDetails := tsArrowBtnDownPressed;
+          ABS_DOWNDISABLED: LScrollDetails := tsArrowBtnDownDisabled;
+          ABS_LEFTNORMAL: LScrollDetails := tsArrowBtnLeftNormal;
+          ABS_LEFTHOT: LScrollDetails := tsArrowBtnLeftHot;
+          ABS_LEFTPRESSED: LScrollDetails := tsArrowBtnLeftPressed;
+          ABS_LEFTDISABLED: LScrollDetails := tsArrowBtnLeftDisabled;
+          ABS_RIGHTNORMAL: LScrollDetails := tsArrowBtnRightNormal;
+          ABS_RIGHTHOT: LScrollDetails := tsArrowBtnRightHot;
+          ABS_RIGHTPRESSED: LScrollDetails := tsArrowBtnRightPressed;
+          ABS_RIGHTDISABLED: LScrollDetails := tsArrowBtnRightDisabled;
+          ABS_UPHOVER: LScrollDetails := tsArrowBtnUpNormal; // tsArrowBtnUpHover;
+          ABS_DOWNHOVER: LScrollDetails := tsArrowBtnDownNormal; // tsArrowBtnDownHover;
+          ABS_LEFTHOVER: LScrollDetails := tsArrowBtnLeftNormal; // tsArrowBtnLeftHover;
+          ABS_RIGHTHOVER: LScrollDetails := tsArrowBtnRightNormal; // tsArrowBtnRightHover;
         end;
       end;
 
     SBP_THUMBBTNHORZ:
       begin
         case iStateId of
-          SCRBS_NORMAL:
-            LScrollDetails := tsThumbBtnHorzNormal;
-          SCRBS_HOT:
-            LScrollDetails := tsThumbBtnHorzHot;
-          SCRBS_PRESSED:
-            LScrollDetails := tsThumbBtnHorzPressed;
-          SCRBS_DISABLED:
-            LScrollDetails := tsThumbBtnHorzDisabled;
-          SCRBS_HOVER:
-            LScrollDetails := tsThumbBtnHorzNormal;
+          SCRBS_NORMAL: LScrollDetails := tsThumbBtnHorzNormal;
+          SCRBS_HOT: LScrollDetails := tsThumbBtnHorzHot;
+          SCRBS_PRESSED: LScrollDetails := tsThumbBtnHorzPressed;
+          SCRBS_DISABLED: LScrollDetails := tsThumbBtnHorzDisabled;
+          SCRBS_HOVER: LScrollDetails := tsThumbBtnHorzNormal;
         end;
       end;
 
     SBP_THUMBBTNVERT:
       begin
         case iStateId of
-          SCRBS_NORMAL:
-            LScrollDetails := tsThumbBtnVertNormal;
-          SCRBS_HOT:
-            LScrollDetails := tsThumbBtnVertHot;
-          SCRBS_PRESSED:
-            LScrollDetails := tsThumbBtnVertPressed;
-          SCRBS_DISABLED:
-            LScrollDetails := tsThumbBtnVertDisabled;
-          SCRBS_HOVER:
-            LScrollDetails := tsThumbBtnVertNormal;
+          SCRBS_NORMAL: LScrollDetails := tsThumbBtnVertNormal;
+          SCRBS_HOT: LScrollDetails := tsThumbBtnVertHot;
+          SCRBS_PRESSED: LScrollDetails := tsThumbBtnVertPressed;
+          SCRBS_DISABLED: LScrollDetails := tsThumbBtnVertDisabled;
+          SCRBS_HOVER: LScrollDetails := tsThumbBtnVertNormal;
         end;
       end;
 
     SBP_LOWERTRACKHORZ:
       begin
         case iStateId of
-          SCRBS_NORMAL:
-            LScrollDetails := tsLowerTrackHorzNormal;
-          SCRBS_HOT:
-            LScrollDetails := tsLowerTrackHorzHot;
-          SCRBS_PRESSED:
-            LScrollDetails := tsLowerTrackHorzPressed;
-          SCRBS_DISABLED:
-            LScrollDetails := tsLowerTrackHorzDisabled;
-          SCRBS_HOVER:
-            LScrollDetails := tsLowerTrackHorzNormal; // tsLowerTrackHorzHover; //no support for hover
+          SCRBS_NORMAL: LScrollDetails := tsLowerTrackHorzNormal;
+          SCRBS_HOT: LScrollDetails := tsLowerTrackHorzHot;
+          SCRBS_PRESSED: LScrollDetails := tsLowerTrackHorzPressed;
+          SCRBS_DISABLED: LScrollDetails := tsLowerTrackHorzDisabled;
+          SCRBS_HOVER: LScrollDetails := tsLowerTrackHorzNormal; // tsLowerTrackHorzHover; //no support for hover
         end;
       end;
 
     SBP_UPPERTRACKHORZ:
       begin
         case iStateId of
-          SCRBS_NORMAL:
-            LScrollDetails := tsUpperTrackHorzNormal;
-          SCRBS_HOT:
-            LScrollDetails := tsUpperTrackHorzHot;
-          SCRBS_PRESSED:
-            LScrollDetails := tsUpperTrackHorzPressed;
-          SCRBS_DISABLED:
-            LScrollDetails := tsUpperTrackHorzDisabled;
-          SCRBS_HOVER:
-            LScrollDetails := tsUpperTrackHorzNormal; // tsUpperTrackHorzHover; //no support for hover
+          SCRBS_NORMAL: LScrollDetails := tsUpperTrackHorzNormal;
+          SCRBS_HOT: LScrollDetails := tsUpperTrackHorzHot;
+          SCRBS_PRESSED: LScrollDetails := tsUpperTrackHorzPressed;
+          SCRBS_DISABLED: LScrollDetails := tsUpperTrackHorzDisabled;
+          SCRBS_HOVER: LScrollDetails := tsUpperTrackHorzNormal; // tsUpperTrackHorzHover; //no support for hover
         end;
       end;
 
     SBP_LOWERTRACKVERT:
       begin
         case iStateId of
-          SCRBS_NORMAL:
-            LScrollDetails := tsLowerTrackVertNormal;
-          SCRBS_HOT:
-            LScrollDetails := tsLowerTrackVertHot;
-          SCRBS_PRESSED:
-            LScrollDetails := tsLowerTrackVertPressed;
-          SCRBS_DISABLED:
-            LScrollDetails := tsLowerTrackVertDisabled;
-          SCRBS_HOVER:
-            LScrollDetails := tsLowerTrackVertNormal; // tsLowerTrackVertHover; //no support for hover
+          SCRBS_NORMAL: LScrollDetails := tsLowerTrackVertNormal;
+          SCRBS_HOT: LScrollDetails := tsLowerTrackVertHot;
+          SCRBS_PRESSED: LScrollDetails := tsLowerTrackVertPressed;
+          SCRBS_DISABLED: LScrollDetails := tsLowerTrackVertDisabled;
+          SCRBS_HOVER: LScrollDetails := tsLowerTrackVertNormal; // tsLowerTrackVertHover; //no support for hover
         end;
       end;
 
     SBP_UPPERTRACKVERT:
       begin
         case iStateId of
-          SCRBS_NORMAL:
-            LScrollDetails := tsUpperTrackVertNormal;
-          SCRBS_HOT:
-            LScrollDetails := tsUpperTrackVertHot;
-          SCRBS_PRESSED:
-            LScrollDetails := tsUpperTrackVertPressed;
-          SCRBS_DISABLED:
-            LScrollDetails := tsUpperTrackVertDisabled;
-          SCRBS_HOVER:
-            LScrollDetails := tsUpperTrackVertNormal; // tsUpperTrackVertHover; //no support for hover
+          SCRBS_NORMAL: LScrollDetails := tsUpperTrackVertNormal;
+          SCRBS_HOT: LScrollDetails := tsUpperTrackVertHot;
+          SCRBS_PRESSED: LScrollDetails := tsUpperTrackVertPressed;
+          SCRBS_DISABLED: LScrollDetails := tsUpperTrackVertDisabled;
+          SCRBS_HOVER: LScrollDetails := tsUpperTrackVertNormal; // tsUpperTrackVertHover; //no support for hover
         end;
       end;
 
     SBP_SIZEBOX:
       begin
         case iStateId of
-          SZB_RIGHTALIGN:
-            LScrollDetails := tsSizeBoxRightAlign;
-          SZB_LEFTALIGN:
-            LScrollDetails := tsSizeBoxLeftAlign;
-          SZB_TOPRIGHTALIGN:
-            LScrollDetails := tsSizeBoxTopRightAlign;
-          SZB_TOPLEFTALIGN:
-            LScrollDetails := tsSizeBoxTopLeftAlign;
-          SZB_HALFBOTTOMRIGHTALIGN:
-            LScrollDetails := tsSizeBoxHalfBottomRightAlign;
-          SZB_HALFBOTTOMLEFTALIGN:
-            LScrollDetails := tsSizeBoxHalfBottomLeftAlign;
-          SZB_HALFTOPRIGHTALIGN:
-            LScrollDetails := tsSizeBoxHalfTopRightAlign;
-          SZB_HALFTOPLEFTALIGN:
-            LScrollDetails := tsSizeBoxHalfTopLeftAlign;
+          SZB_RIGHTALIGN: LScrollDetails := tsSizeBoxRightAlign;
+          SZB_LEFTALIGN:LScrollDetails := tsSizeBoxLeftAlign;
+          SZB_TOPRIGHTALIGN: LScrollDetails := tsSizeBoxTopRightAlign;
+          SZB_TOPLEFTALIGN: LScrollDetails := tsSizeBoxTopLeftAlign;
+          SZB_HALFBOTTOMRIGHTALIGN: LScrollDetails := tsSizeBoxHalfBottomRightAlign;
+          SZB_HALFBOTTOMLEFTALIGN: LScrollDetails := tsSizeBoxHalfBottomLeftAlign;
+          SZB_HALFTOPRIGHTALIGN: LScrollDetails := tsSizeBoxHalfTopRightAlign;
+          SZB_HALFTOPLEFTALIGN: LScrollDetails := tsSizeBoxHalfTopLeftAlign;
         end;
       end;
 
     SBP_GRIPPERHORZ:
       begin
         case iStateId of
-          SCRBS_NORMAL:
-            LScrollDetails := tsGripperHorzNormal;
-          SCRBS_HOT:
-            LScrollDetails := tsGripperHorzHot;
-          SCRBS_PRESSED:
-            LScrollDetails := tsGripperHorzPressed;
-          SCRBS_DISABLED:
-            LScrollDetails := tsGripperHorzDisabled;
-          SCRBS_HOVER:
-            LScrollDetails := tsGripperHorzHover; // tsGripperHorzHover; //no support for hover
+          SCRBS_NORMAL: LScrollDetails := tsGripperHorzNormal;
+          SCRBS_HOT: LScrollDetails := tsGripperHorzHot;
+          SCRBS_PRESSED: LScrollDetails := tsGripperHorzPressed;
+          SCRBS_DISABLED: LScrollDetails := tsGripperHorzDisabled;
+          SCRBS_HOVER: LScrollDetails := tsGripperHorzHover; // tsGripperHorzHover; //no support for hover
         end;
       end;
 
     SBP_GRIPPERVERT:
       begin
         case iStateId of
-          SCRBS_NORMAL:
-            LScrollDetails := tsGripperVertNormal;
-          SCRBS_HOT:
-            LScrollDetails := tsGripperVertHot;
-          SCRBS_PRESSED:
-            LScrollDetails := tsGripperVertPressed;
-          SCRBS_DISABLED:
-            LScrollDetails := tsGripperVertDisabled;
-          SCRBS_HOVER:
-            LScrollDetails := tsGripperVertNormal; // tsGripperVertHover; //no support for hover
+          SCRBS_NORMAL: LScrollDetails := tsGripperVertNormal;
+          SCRBS_HOT: LScrollDetails := tsGripperVertHot;
+          SCRBS_PRESSED: LScrollDetails := tsGripperVertPressed;
+          SCRBS_DISABLED: LScrollDetails := tsGripperVertDisabled;
+          SCRBS_HOVER: LScrollDetails := tsGripperVertNormal; // tsGripperVertHover; //no support for hover
         end;
       end;
   end;
@@ -3860,12 +3610,9 @@ begin
     EP_BACKGROUNDWITHBORDER, EP_EDITBORDER_NOSCROLL:
       begin
         case iStateId of
-          EPSN_NORMAL:
-            LDetails := StyleServices.GetElementDetails(teEditBorderNoScrollNormal);
-          EPSN_HOT:
-            LDetails := StyleServices.GetElementDetails(teEditBorderNoScrollHot);
-          EPSN_FOCUSED:
-            LDetails := StyleServices.GetElementDetails(teEditBorderNoScrollFocused);
+          EPSN_NORMAL: LDetails := StyleServices.GetElementDetails(teEditBorderNoScrollNormal);
+          EPSN_HOT: LDetails := StyleServices.GetElementDetails(teEditBorderNoScrollHot);
+          EPSN_FOCUSED: LDetails := StyleServices.GetElementDetails(teEditBorderNoScrollFocused);
           EPSN_DISABLED:
             begin
               // LDetails := StyleServices.GetElementDetails(teEditBorderNoScrollDisabled);
@@ -3881,14 +3628,10 @@ begin
     EP_EDITBORDER_HSCROLL:
       begin
         case iStateId of
-          EPSH_NORMAL:
-            LDetails := StyleServices.GetElementDetails(teEditBorderHScrollNormal);
-          EPSH_HOT:
-            LDetails := StyleServices.GetElementDetails(teEditBorderHScrollHot);
-          EPSH_FOCUSED:
-            LDetails := StyleServices.GetElementDetails(teEditBorderHScrollFocused);
-          EPSH_DISABLED:
-            LDetails := StyleServices.GetElementDetails(teEditBorderHScrollDisabled);
+          EPSH_NORMAL: LDetails := StyleServices.GetElementDetails(teEditBorderHScrollNormal);
+          EPSH_HOT: LDetails := StyleServices.GetElementDetails(teEditBorderHScrollHot);
+          EPSH_FOCUSED: LDetails := StyleServices.GetElementDetails(teEditBorderHScrollFocused);
+          EPSH_DISABLED: LDetails := StyleServices.GetElementDetails(teEditBorderHScrollDisabled);
         end;
 
         DrawStyleElement(hdc, LDetails, pRect);
@@ -3898,14 +3641,10 @@ begin
     EP_EDITBORDER_VSCROLL:
       begin
         case iStateId of
-          EPSV_NORMAL:
-            LDetails := StyleServices.GetElementDetails(teEditBorderVScrollNormal);
-          EPSV_HOT:
-            LDetails := StyleServices.GetElementDetails(teEditBorderVScrollHot);
-          EPSV_FOCUSED:
-            LDetails := StyleServices.GetElementDetails(teEditBorderVScrollFocused);
-          EPSV_DISABLED:
-            LDetails := StyleServices.GetElementDetails(teEditBorderVScrollDisabled);
+          EPSV_NORMAL: LDetails := StyleServices.GetElementDetails(teEditBorderVScrollNormal);
+          EPSV_HOT: LDetails := StyleServices.GetElementDetails(teEditBorderVScrollHot);
+          EPSV_FOCUSED: LDetails := StyleServices.GetElementDetails(teEditBorderVScrollFocused);
+          EPSV_DISABLED: LDetails := StyleServices.GetElementDetails(teEditBorderVScrollDisabled);
         end;
 
         DrawStyleElement(hdc, LDetails, pRect);
@@ -3915,14 +3654,10 @@ begin
     EP_EDITBORDER_HVSCROLL:
       begin
         case iStateId of
-          EPSHV_NORMAL:
-            LDetails := StyleServices.GetElementDetails(teEditBorderHVScrollNormal);
-          EPSHV_HOT:
-            LDetails := StyleServices.GetElementDetails(teEditBorderHVScrollHot);
-          EPSHV_FOCUSED:
-            LDetails := StyleServices.GetElementDetails(teEditBorderHVScrollFocused);
-          EPSHV_DISABLED:
-            LDetails := StyleServices.GetElementDetails(teEditBorderHVScrollDisabled);
+          EPSHV_NORMAL: LDetails := StyleServices.GetElementDetails(teEditBorderHVScrollNormal);
+          EPSHV_HOT: LDetails := StyleServices.GetElementDetails(teEditBorderHVScrollHot);
+          EPSHV_FOCUSED: LDetails := StyleServices.GetElementDetails(teEditBorderHVScrollFocused);
+          EPSHV_DISABLED: LDetails := StyleServices.GetElementDetails(teEditBorderHVScrollDisabled);
         end;
 
         DrawStyleElement(hdc, LDetails, pRect);
@@ -4140,6 +3875,7 @@ begin
         end;
       end;
 
+{$IFDEF INNO_SETUP}
     MENU_POPUPCHECK:
       begin
         case iStateId of
@@ -4172,6 +3908,7 @@ begin
             end;
         end;
       end;
+{$ENDIF INNO_SETUP}
 
     MENU_SYSTEMRESTORE:
       begin
@@ -4632,156 +4369,160 @@ const
 
 initialization
 
-VCLStylesLock := TCriticalSection.Create;
-THThemesClasses := TDictionary<hTheme, string>.Create;
-THThemesHWND := TDictionary<hTheme, hwnd>.Create;
-FuncsDrawThemeBackground := TDictionary<string, TFuncDrawThemeBackground>.Create(TIStringComparer.Ordinal);
+  VCLStylesLock := TCriticalSection.Create;
+  THThemesClasses := TDictionary<hTheme, string>.Create;
+  THThemesHWND := TDictionary<hTheme, hwnd>.Create;
+  FuncsDrawThemeBackground := TDictionary<string, TFuncDrawThemeBackground>.Create(TIStringComparer.Ordinal);
 
-if StyleServices.Available then
-begin
-// Element specific handlers
-
-{$IFDEF HOOK_InfoBar}
-  FuncsDrawThemeBackground.Add(VSCLASS_INFOBAR, @UxTheme_InfoBar);
-{$ENDIF}
-{$IFDEF HOOK_BREADCRUMBAR}
-  FuncsDrawThemeBackground.Add(VSCLASS_BREADCRUMBAR, @UxTheme_BreadCrumBar);
-{$ENDIF}
-{$IFDEF HOOK_TRYHARDER}
-  FuncsDrawThemeBackground.Add(VSCLASS_TRYHARDER, @UxTheme_TryHarder);
-{$ENDIF}
-{$IFDEF HOOK_Tab}
-  FuncsDrawThemeBackground.Add(VSCLASS_TAB, @UxTheme_Tab);
-{$ENDIF}
-{$IFDEF HOOK_ToolTip}
-  FuncsDrawThemeBackground.Add(VSCLASS_TOOLTIP, @UxTheme_ToolTip);
-{$ENDIF}
-{$IFDEF HOOK_TrackBar}
-  FuncsDrawThemeBackground.Add(VSCLASS_TRACKBAR, @UxTheme_TrackBar);
-{$ENDIF}
-{$IFDEF HOOK_PreviewPane}
-  FuncsDrawThemeBackground.Add(VSCLASS_PREVIEWPANE, @UxTheme_PreviewPane);
-{$ENDIF}
-{$IFDEF HOOK_ToolBar}
-  FuncsDrawThemeBackground.Add(VSCLASS_TOOLBAR, @UxTheme_ToolBar);
-{$ENDIF}
-{$IFDEF HOOK_AddressBand}
-  FuncsDrawThemeBackground.Add(VSCLASS_ADDRESSBAND, @UxTheme_AddressBand);
-{$ENDIF}
-{$IFDEF HOOK_SearchBox}
-  FuncsDrawThemeBackground.Add(VSCLASS_SEARCHBOX, @UxTheme_SearchBox);
-  FuncsDrawThemeBackground.Add(VSCLASS_CompositedSEARCHBOX, @UxTheme_SearchBox);
-  FuncsDrawThemeBackground.Add(VSCLASS_SearchBoxComposited, @UxTheme_SearchBox);
-  FuncsDrawThemeBackground.Add(VSCLASS_INACTIVESEARCHBOX, @UxTheme_SearchBox);
-{$ENDIF}
-{$IFDEF HOOK_CommandModule}
-  FuncsDrawThemeBackground.Add(VSCLASS_COMMANDMODULE, @UxTheme_CommandModule);
-{$ENDIF}
-{$IFDEF HOOK_Menu}
-  FuncsDrawThemeBackground.Add(VSCLASS_MENU, @UxTheme_Menu);
-{$ENDIF}
-{$IFDEF HOOK_Rebar}
-  FuncsDrawThemeBackground.Add(VSCLASS_REBAR, @UxTheme_Rebar);
-{$ENDIF}
-{$IFDEF HOOK_Edit}
-  FuncsDrawThemeBackground.Add(VSCLASS_EDIT, @UxTheme_Edit);
-{$ENDIF}
-{$IFDEF HOOK_ListBox}
-  FuncsDrawThemeBackground.Add(VSCLASS_LISTBOX, @UxTheme_ListBox);
-{$ENDIF}
-{$IFDEF HOOK_Spin}
-  FuncsDrawThemeBackground.Add(VSCLASS_SPIN, @UxTheme_Spin);
-{$ENDIF}
-{$IFDEF HOOK_ComboBox}
-  FuncsDrawThemeBackground.Add(VSCLASS_COMBOBOX, @UxTheme_ComboBox);
-{$ENDIF}
-{$IFDEF HOOK_ListView}
-  FuncsDrawThemeBackground.Add(VSCLASS_LISTVIEWPOPUP, @UxTheme_ListViewPopup);
-
-  FuncsDrawThemeBackground.Add(VSCLASS_HEADER, @UxTheme_Header);
-  FuncsDrawThemeBackground.Add(VSCLASS_ITEMSVIEW_HEADER, @UxTheme_Header);
-
-  FuncsDrawThemeBackground.Add(VSCLASS_LISTVIEW, @UxTheme_ListView);
-  FuncsDrawThemeBackground.Add(VSCLASS_ITEMSVIEW, @UxTheme_ListView);
-  FuncsDrawThemeBackground.Add(VSCLASS_ITEMSVIEW_LISTVIEW, @UxTheme_ListView);
-  FuncsDrawThemeBackground.Add(VSCLASS_EXPLORER_LISTVIEW, @UxTheme_ListView);
-{$ENDIF}
-{$IFDEF HOOK_DateTimePicker}
-  FuncsDrawThemeBackground.Add(VSCLASS_DATEPICKER, @UxTheme_DatePicker);
-  FuncsDrawThemeBackground.Add(VSCLASS_MONTHCAL, @UxTheme_MonthCal);
-{$ENDIF}
-{$IFDEF HOOK_Scrollbar}
-  FuncsDrawThemeBackground.Add(VSCLASS_SCROLLBAR, @UxTheme_ScrollBar);
-{$ENDIF}
-{$IFDEF HOOK_Progressbar}
-  FuncsDrawThemeBackground.Add(VSCLASS_PROGRESS, @UxTheme_ProgressBar);
-  FuncsDrawThemeBackground.Add(VSCLASS_PROGRESS_INDERTERMINATE, @UxTheme_ProgressBar);
-{$ENDIF}
-{$IFDEF HOOK_TaskDialog}
-  FuncsDrawThemeBackground.Add(VSCLASS_TASKDIALOG, @UxTheme_TaskDialog);
-{$ENDIF}
-{$IFDEF HOOK_Button}
-  FuncsDrawThemeBackground.Add(VSCLASS_BUTTON, @UxTheme_Button);
-{$ENDIF}
-{$IFDEF HOOK_AllButtons}
-  FuncsDrawThemeBackground.Add('Button-OK;Button', @UxTheme_Button);
-  FuncsDrawThemeBackground.Add('Button-CANCEL;Button', @UxTheme_Button);
-{$ENDIF}
-{$IFDEF HOOK_TreeView}
-  FuncsDrawThemeBackground.Add(VSCLASS_TREEVIEW, @UxTheme_TreeView);
-{$ENDIF}
-{$IFDEF HOOK_Navigation}
-  if TOSVersion.Check(6, 2) then // Windows 8, 10...
+  if StyleServices.Available then
   begin
-    FuncsDrawThemeBackground.Add(VSCLASS_NAVIGATION, @UxTheme_Navigation);
-    FuncsDrawThemeBackground.Add(VSCLASS_COMMONITEMSDIALOG, @UxTheme_CommonItemsDialog);
-  end;
-{$ENDIF}
+  // Element specific handlers
 
-  // General hooks
-  @Trampoline_UxTheme_OpenThemeData := InterceptCreate(themelib, 'OpenThemeData', @Detour_UxTheme_OpenThemeData);
-  {$IF CompilerVersion >= 30}
-  if TOSVersion.Check(10) then
-  begin
-    @Trampoline_UxTheme_OpenThemeDataForDPI := InterceptCreate(themelib, 'OpenThemeDataForDpi', @Detour_UxTheme_OpenThemeDataForDPI);
-    if (@Trampoline_UxTheme_OpenThemeDataForDPI = nil) and (TOSVersion.Build < 15063) then // W10 Creators Update?
-      @Trampoline_UxTheme_OpenThemeDataForDPI := InterceptCreateOrdinal(themelib, 129, @Detour_UxTheme_OpenThemeDataForDPI);
-  end;
-  {$IFEND}
-  @Trampoline_UxTheme_OpenThemeDataEx := InterceptCreate(themelib, 'OpenThemeDataEx', @Detour_UxTheme_OpenThemeDataEx);
-  @Trampoline_UxTheme_DrawThemeBackground := InterceptCreate(themelib, 'DrawThemeBackground', @Detour_UxTheme_DrawThemeBackground);
-  @Trampoline_UxTheme_DrawThemeBackgroundEx := InterceptCreate(themelib, 'DrawThemeBackgroundEx', @Detour_UxTheme_DrawThemeBackgroundEx);
-  @Trampoline_UxTheme_DrawThemeEdge := InterceptCreate(themelib, 'DrawThemeEdge', @Detour_UxTheme_DrawThemeEdge);
+  {$IFDEF HOOK_InfoBar}
+    FuncsDrawThemeBackground.Add(VSCLASS_INFOBAR, @UxTheme_InfoBar);
+  {$ENDIF}
+  {$IFDEF HOOK_BREADCRUMBAR}
+    FuncsDrawThemeBackground.Add(VSCLASS_BREADCRUMBAR, @UxTheme_BreadCrumBar);
+  {$ENDIF}
+  {$IFDEF HOOK_TRYHARDER}
+    FuncsDrawThemeBackground.Add(VSCLASS_TRYHARDER, @UxTheme_TryHarder);
+  {$ENDIF}
+  {$IFDEF HOOK_Tab}
+    FuncsDrawThemeBackground.Add(VSCLASS_TAB, @UxTheme_Tab);
+  {$ENDIF}
+  {$IFDEF HOOK_ToolTip}
+    FuncsDrawThemeBackground.Add(VSCLASS_TOOLTIP, @UxTheme_ToolTip);
+  {$ENDIF}
+  {$IFDEF HOOK_TrackBar}
+    FuncsDrawThemeBackground.Add(VSCLASS_TRACKBAR, @UxTheme_TrackBar);
+  {$ENDIF}
+  {$IFDEF HOOK_PreviewPane}
+    FuncsDrawThemeBackground.Add(VSCLASS_PREVIEWPANE, @UxTheme_PreviewPane);
+  {$ENDIF}
+  {$IFDEF HOOK_ToolBar}
+    FuncsDrawThemeBackground.Add(VSCLASS_TOOLBAR, @UxTheme_ToolBar);
+  {$ENDIF}
+  {$IFDEF HOOK_AddressBand}
+    FuncsDrawThemeBackground.Add(VSCLASS_ADDRESSBAND, @UxTheme_AddressBand);
+  {$ENDIF}
+  {$IFDEF HOOK_SearchBox}
+    FuncsDrawThemeBackground.Add(VSCLASS_SEARCHBOX, @UxTheme_SearchBox);
+    FuncsDrawThemeBackground.Add(VSCLASS_CompositedSEARCHBOX, @UxTheme_SearchBox);
+    FuncsDrawThemeBackground.Add(VSCLASS_SearchBoxComposited, @UxTheme_SearchBox);
+    FuncsDrawThemeBackground.Add(VSCLASS_INACTIVESEARCHBOX, @UxTheme_SearchBox);
+  {$ENDIF}
+  {$IFDEF HOOK_CommandModule}
+    FuncsDrawThemeBackground.Add(VSCLASS_COMMANDMODULE, @UxTheme_CommandModule);
+  {$ENDIF}
+  {$IFDEF HOOK_Menu}
+    FuncsDrawThemeBackground.Add(VSCLASS_MENU, @UxTheme_Menu);
+  {$ENDIF}
+  {$IFDEF HOOK_Rebar}
+    FuncsDrawThemeBackground.Add(VSCLASS_REBAR, @UxTheme_Rebar);
+  {$ENDIF}
+  {$IFDEF HOOK_Edit}
+    FuncsDrawThemeBackground.Add(VSCLASS_EDIT, @UxTheme_Edit);
+  {$ENDIF}
+  {$IFDEF HOOK_ListBox}
+    FuncsDrawThemeBackground.Add(VSCLASS_LISTBOX, @UxTheme_ListBox);
+  {$ENDIF}
+  {$IFDEF HOOK_Spin}
+    FuncsDrawThemeBackground.Add(VSCLASS_SPIN, @UxTheme_Spin);
+  {$ENDIF}
+  {$IFDEF HOOK_ComboBox}
+    FuncsDrawThemeBackground.Add(VSCLASS_COMBOBOX, @UxTheme_ComboBox);
+  {$ENDIF}
+  {$IFDEF HOOK_ListView}
+    FuncsDrawThemeBackground.Add(VSCLASS_LISTVIEWPOPUP, @UxTheme_ListViewPopup);
 
-  @Trampoline_UxTheme_DrawThemeText := InterceptCreate(themelib, 'DrawThemeText', @Detour_UxTheme_DrawThemeText);
-  @Trampoline_UxTheme_DrawThemeTextEx := InterceptCreate(themelib, 'DrawThemeTextEx', @Detour_UxTheme_DrawThemeTextEx);
-  @Trampoline_UxTheme_GetThemeSysColor := InterceptCreate(themelib, 'GetThemeSysColor', @Detour_UxTheme_GetThemeSysColor);
-  @Trampoline_UxTheme_GetThemeSysColorBrush := InterceptCreate(themelib, 'GetThemeSysColorBrush', @Detour_UxTheme_GetThemeSysColorBrush);
-  @Trampoline_UxTheme_GetThemeColor := InterceptCreate(themelib, 'GetThemeColor', @Detour_UxTheme_GetThemeColor);
-end;
+    FuncsDrawThemeBackground.Add(VSCLASS_HEADER, @UxTheme_Header);
+    FuncsDrawThemeBackground.Add(VSCLASS_ITEMSVIEW_HEADER, @UxTheme_Header);
+
+    FuncsDrawThemeBackground.Add(VSCLASS_LISTVIEW, @UxTheme_ListView);
+    FuncsDrawThemeBackground.Add(VSCLASS_ITEMSVIEW, @UxTheme_ListView);
+    FuncsDrawThemeBackground.Add(VSCLASS_ITEMSVIEW_LISTVIEW, @UxTheme_ListView);
+    FuncsDrawThemeBackground.Add(VSCLASS_EXPLORER_LISTVIEW, @UxTheme_ListView);
+  {$ENDIF}
+{$IFDEF INNO_SETUP}
+  {$IFDEF HOOK_DateTimePicker}
+    FuncsDrawThemeBackground.Add(VSCLASS_DATEPICKER, @UxTheme_DatePicker);
+    FuncsDrawThemeBackground.Add(VSCLASS_MONTHCAL, @UxTheme_MonthCal);
+  {$ENDIF}
+{$ENDIF INNO_SETUP}
+  {$IFDEF HOOK_Scrollbar}
+    FuncsDrawThemeBackground.Add(VSCLASS_SCROLLBAR, @UxTheme_ScrollBar);
+  {$ENDIF}
+  {$IFDEF HOOK_Progressbar}
+    FuncsDrawThemeBackground.Add(VSCLASS_PROGRESS, @UxTheme_ProgressBar);
+    FuncsDrawThemeBackground.Add(VSCLASS_PROGRESS_INDERTERMINATE, @UxTheme_ProgressBar);
+  {$ENDIF}
+  {$IFDEF HOOK_TaskDialog}
+    FuncsDrawThemeBackground.Add(VSCLASS_TASKDIALOG, @UxTheme_TaskDialog);
+  {$ENDIF}
+  {$IFDEF HOOK_Button}
+    FuncsDrawThemeBackground.Add(VSCLASS_BUTTON, @UxTheme_Button);
+  {$ENDIF}
+  {$IFDEF HOOK_AllButtons}
+    FuncsDrawThemeBackground.Add('Button-OK;Button', @UxTheme_Button);
+    FuncsDrawThemeBackground.Add('Button-CANCEL;Button', @UxTheme_Button);
+  {$ENDIF}
+  {$IFDEF HOOK_TreeView}
+    FuncsDrawThemeBackground.Add(VSCLASS_TREEVIEW, @UxTheme_TreeView);
+  {$ENDIF}
+{$IFDEF INNO_SETUP}
+  {$IFDEF HOOK_Navigation}
+    if TOSVersion.Check(6, 2) then // Windows 8, 10...
+    begin
+      FuncsDrawThemeBackground.Add(VSCLASS_NAVIGATION, @UxTheme_Navigation);
+      FuncsDrawThemeBackground.Add(VSCLASS_COMMONITEMSDIALOG, @UxTheme_CommonItemsDialog);
+    end;
+  {$ENDIF}
+{$ENDIF INNO_SETUP}
+
+    // General hooks
+    @Trampoline_UxTheme_OpenThemeData := InterceptCreate(themelib, 'OpenThemeData', @Detour_UxTheme_OpenThemeData);
+    {$IF CompilerVersion >= 30}
+    if TOSVersion.Check(10) then
+    begin
+      @Trampoline_UxTheme_OpenThemeDataForDPI := InterceptCreate(themelib, 'OpenThemeDataForDpi', @Detour_UxTheme_OpenThemeDataForDPI);
+      if (@Trampoline_UxTheme_OpenThemeDataForDPI = nil) and (TOSVersion.Build < 15063) then // W10 Creators Update?
+        @Trampoline_UxTheme_OpenThemeDataForDPI := InterceptCreateOrdinal(themelib, 129, @Detour_UxTheme_OpenThemeDataForDPI);
+    end;
+    {$IFEND}
+    @Trampoline_UxTheme_OpenThemeDataEx := InterceptCreate(themelib, 'OpenThemeDataEx', @Detour_UxTheme_OpenThemeDataEx);
+    @Trampoline_UxTheme_DrawThemeBackground := InterceptCreate(themelib, 'DrawThemeBackground', @Detour_UxTheme_DrawThemeBackground);
+    @Trampoline_UxTheme_DrawThemeBackgroundEx := InterceptCreate(themelib, 'DrawThemeBackgroundEx', @Detour_UxTheme_DrawThemeBackgroundEx);
+    @Trampoline_UxTheme_DrawThemeEdge := InterceptCreate(themelib, 'DrawThemeEdge', @Detour_UxTheme_DrawThemeEdge);
+
+    @Trampoline_UxTheme_DrawThemeText := InterceptCreate(themelib, 'DrawThemeText', @Detour_UxTheme_DrawThemeText);
+    @Trampoline_UxTheme_DrawThemeTextEx := InterceptCreate(themelib, 'DrawThemeTextEx', @Detour_UxTheme_DrawThemeTextEx);
+    @Trampoline_UxTheme_GetThemeSysColor := InterceptCreate(themelib, 'GetThemeSysColor', @Detour_UxTheme_GetThemeSysColor);
+    @Trampoline_UxTheme_GetThemeSysColorBrush := InterceptCreate(themelib, 'GetThemeSysColorBrush', @Detour_UxTheme_GetThemeSysColorBrush);
+    @Trampoline_UxTheme_GetThemeColor := InterceptCreate(themelib, 'GetThemeColor', @Detour_UxTheme_GetThemeColor);
+  end;
 
 finalization
 
-InterceptRemove(@Trampoline_UxTheme_GetThemeSysColor);
-InterceptRemove(@Trampoline_UxTheme_GetThemeSysColorBrush);
-InterceptRemove(@Trampoline_UxTheme_OpenThemeData);
-{$IF CompilerVersion >= 30}
-if TOSVersion.Check(10) then
-  InterceptRemove(@Trampoline_UxTheme_OpenThemeDataForDPI);
-{$IFEND}
-InterceptRemove(@Trampoline_UxTheme_OpenThemeDataEx);
-InterceptRemove(@Trampoline_UxTheme_GetThemeColor);
-InterceptRemove(@Trampoline_UxTheme_DrawThemeBackground);
-InterceptRemove(@Trampoline_UxTheme_DrawThemeText);
-InterceptRemove(@Trampoline_UxTheme_DrawThemeTextEx);
-InterceptRemove(@Trampoline_UxTheme_DrawThemeBackgroundEx);
-InterceptRemove(@Trampoline_UxTheme_DrawThemeEdge);
+  InterceptRemove(@Trampoline_UxTheme_GetThemeSysColor);
+  InterceptRemove(@Trampoline_UxTheme_GetThemeSysColorBrush);
+  InterceptRemove(@Trampoline_UxTheme_OpenThemeData);
+  {$IF CompilerVersion >= 30}
+  if TOSVersion.Check(10) then
+    InterceptRemove(@Trampoline_UxTheme_OpenThemeDataForDPI);
+  {$IFEND}
+  InterceptRemove(@Trampoline_UxTheme_OpenThemeDataEx);
+  InterceptRemove(@Trampoline_UxTheme_GetThemeColor);
+  InterceptRemove(@Trampoline_UxTheme_DrawThemeBackground);
+  InterceptRemove(@Trampoline_UxTheme_DrawThemeText);
+  InterceptRemove(@Trampoline_UxTheme_DrawThemeTextEx);
+  InterceptRemove(@Trampoline_UxTheme_DrawThemeBackgroundEx);
+  InterceptRemove(@Trampoline_UxTheme_DrawThemeEdge);
 
-THThemesClasses.Free;
-THThemesHWND.Free;
-FuncsDrawThemeBackground.Free;
+  THThemesClasses.Free;
+  THThemesHWND.Free;
+  FuncsDrawThemeBackground.Free;
 
-VCLStylesLock.Free;
-VCLStylesLock := nil;
+  VCLStylesLock.Free;
+  VCLStylesLock := nil;
 
 end.
