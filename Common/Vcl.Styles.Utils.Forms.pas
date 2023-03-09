@@ -1418,8 +1418,10 @@ begin
       begin
         Message.Result := CallDefaultProc(Message);
         { DFBW =Default Frame Border Width }
-        DFBW := GetSysMetrics(SM_CXSIZEFRAME) * 2;
-        //Inc(DFBW);
+        { Do not update! for Inno Setup }
+        DFBW := GetSysMetrics(SM_CXBORDER);
+        Inc(DFBW);
+        { ----------------------------- }
         LBorderSize := GetBorderSize;
         DX := LBorderSize.Left + LBorderSize.Right - 2*DFBW;
 
