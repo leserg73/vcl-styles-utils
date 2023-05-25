@@ -23,10 +23,10 @@ unit Vcl.Styles.FontAwesome;
 
 interface
 
-{$IF CompilerVersion >= 34.0}
-
- {$DEFINE WinXCtrls}
-{$ENDIF}
+// Not used with Inno Setup
+//  {$IF CompilerVersion >= 30.0}
+//    {$DEFINE WinXCtrls}
+//  {$ENDIF}
 
 uses
   Winapi.GDIPOBJ,

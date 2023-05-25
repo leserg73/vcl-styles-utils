@@ -72,11 +72,11 @@ uses
   Vcl.Themes,
   Vcl.Imaging.pngimage,
   Vcl.Styles.Utils.Graphics,
-{$IFDEF INNO_SETUP}
+{$IFDEF FONT_AWS}
   {$IF Defined(HOOK_DateTimePicker) or Defined(HOOK_Menu) or Defined(HOOK_SearchBox) or Defined(HOOK_Navigation)}
   Vcl.Styles.FontAwesome,
   {$ENDIF}
-{$ENDIF INNO_SETUP}
+{$ENDIF FONT_AWS}
   Vcl.Styles.Utils.SysControls,
   Vcl.Styles.Utils.Misc;
 
@@ -130,13 +130,13 @@ const
   VSCLASS_BREADCRUMBAR = 'BreadcrumbBar';
 {$ENDIF}
 
-{$IFDEF INNO_SETUP}
+{$IFDEF FONT_AWS}
 {$IFDEF HOOK_Navigation}
 const
   VSCLASS_NAVIGATION = 'Navigation';
   VSCLASS_COMMONITEMSDIALOG = 'CommonItemsDialog';
 {$ENDIF}
-{$ENDIF INNO_SETUP}
+{$ENDIF FONT_AWS}
 
 {$IFDEF HOOK_TreeView}
 const
@@ -236,7 +236,7 @@ begin
     CloseThemeData(hThemeNew);
   {$ENDIF}
 
-{$IFDEF INNO_SETUP}
+{$IFDEF FONT_AWS}
   {$IFDEF HOOK_Navigation}
   hThemeNew := Trampoline_UxTheme_OpenThemeData(0, VSCLASS_NAVIGATION);
   if hThemeNew = hTheme then
@@ -244,7 +244,7 @@ begin
   else
     CloseThemeData(hThemeNew);
   {$ENDIF}
-{$ENDIF INNO_SETUP}
+{$ENDIF FONT_AWS}
 
   {$IFDEF HOOK_CommandModule}
   hThemeNew := Trampoline_UxTheme_OpenThemeData(0, VSCLASS_COMMANDMODULE);
@@ -1211,6 +1211,7 @@ begin
     end
     else
     {$ENDIF}
+{$IFDEF FONT_AWS}
     {$IFDEF HOOK_DateTimePicker}
     if SameText(LThemeClass, VSCLASS_DATEPICKER) then
     begin
@@ -1344,6 +1345,7 @@ begin
     end
     else
     {$ENDIF}
+{$ENDIF FONT_AWS}
     {$IF Defined(HOOK_Button) or Defined(HOOK_AllButtons)}
     if {$IFDEF HOOK_AllButtons}(LThemeClasses.IndexOf(VSCLASS_BUTTON) >= 0){$ELSE}False{$ENDIF} or
        {$IFDEF HOOK_Button}    (SameText(LThemeClass, VSCLASS_BUTTON))     {$ELSE}False{$ENDIF} then
@@ -2567,7 +2569,7 @@ begin
     // end;
 
     // Magnifier
-{$IFDEF INNO_SETUP}
+{$IFDEF FONT_AWS}
     3:
       begin
         case iStateId of
@@ -2579,7 +2581,7 @@ begin
             end;
         end;
       end;
-{$ENDIF INNO_SETUP}
+{$ENDIF FONT_AWS}
   end;
 
   // OutputDebugString(PChar(Format('UxTheme_SearchBox hTheme %d iPartId %d iStateId %d', [hTheme, iPartId, iStateId])));
@@ -2587,7 +2589,7 @@ begin
 end;
 {$ENDIF}
 
-{$IFDEF INNO_SETUP}
+{$IFDEF FONT_AWS}
 {$IFDEF HOOK_DateTimePicker}
 function UxTheme_MonthCal(hTheme: hTheme; hdc: hdc; iPartId, iStateId: Integer; const pRect: TRect; Foo: Pointer;
   Trampoline: TDrawThemeBackground; LThemeClass: string; hwnd: hwnd = 0): HRESULT; stdcall;
@@ -2754,7 +2756,7 @@ begin
   exit(Trampoline(hTheme, hdc, iPartId, iStateId, pRect, Foo));
 end;
 {$ENDIF}
-{$ENDIF INNO_SETUP}
+{$ENDIF FONT_AWS}
 
 {$IFDEF HOOK_ComboBox}
 function UxTheme_ComboBox(hTheme: hTheme; hdc: hdc; iPartId, iStateId: Integer; const pRect: TRect; Foo: Pointer;
@@ -2912,7 +2914,7 @@ begin
 end;
 {$ENDIF}
 
-{$IFDEF INNO_SETUP}
+{$IFDEF FONT_AWS}
 {$IFDEF HOOK_Navigation}
 function UxTheme_Navigation(hTheme: hTheme; hdc: hdc; iPartId, iStateId: Integer; const pRect: TRect; Foo: Pointer;
   Trampoline: TDrawThemeBackground; LThemeClass: string; hwnd: hwnd): HRESULT; stdcall;
@@ -3072,7 +3074,7 @@ begin
   exit(Trampoline(hTheme, hdc, iPartId, iStateId, pRect, Foo));
 end;
 {$ENDIF}
-{$ENDIF INNO_SETUP}
+{$ENDIF FONT_AWS}
 
 {$IFDEF HOOK_TreeView}
 function UxTheme_TreeView(hTheme: hTheme; hdc: hdc; iPartId, iStateId: Integer; const pRect: TRect; Foo: Pointer;
@@ -3875,7 +3877,7 @@ begin
         end;
       end;
 
-{$IFDEF INNO_SETUP}
+{$IFDEF FONT_AWS}
     MENU_POPUPCHECK:
       begin
         case iStateId of
@@ -3908,7 +3910,7 @@ begin
             end;
         end;
       end;
-{$ENDIF INNO_SETUP}
+{$ENDIF FONT_AWS}
 
     MENU_SYSTEMRESTORE:
       begin
@@ -4443,12 +4445,12 @@ initialization
     FuncsDrawThemeBackground.Add(VSCLASS_ITEMSVIEW_LISTVIEW, @UxTheme_ListView);
     FuncsDrawThemeBackground.Add(VSCLASS_EXPLORER_LISTVIEW, @UxTheme_ListView);
   {$ENDIF}
-{$IFDEF INNO_SETUP}
+{$IFDEF FONT_AWS}
   {$IFDEF HOOK_DateTimePicker}
     FuncsDrawThemeBackground.Add(VSCLASS_DATEPICKER, @UxTheme_DatePicker);
     FuncsDrawThemeBackground.Add(VSCLASS_MONTHCAL, @UxTheme_MonthCal);
   {$ENDIF}
-{$ENDIF INNO_SETUP}
+{$ENDIF FONT_AWS}
   {$IFDEF HOOK_Scrollbar}
     FuncsDrawThemeBackground.Add(VSCLASS_SCROLLBAR, @UxTheme_ScrollBar);
   {$ENDIF}
@@ -4469,7 +4471,7 @@ initialization
   {$IFDEF HOOK_TreeView}
     FuncsDrawThemeBackground.Add(VSCLASS_TREEVIEW, @UxTheme_TreeView);
   {$ENDIF}
-{$IFDEF INNO_SETUP}
+{$IFDEF FONT_AWS}
   {$IFDEF HOOK_Navigation}
     if TOSVersion.Check(6, 2) then // Windows 8, 10...
     begin
@@ -4477,7 +4479,7 @@ initialization
       FuncsDrawThemeBackground.Add(VSCLASS_COMMONITEMSDIALOG, @UxTheme_CommonItemsDialog);
     end;
   {$ENDIF}
-{$ENDIF INNO_SETUP}
+{$ENDIF FONT_AWS}
 
     // General hooks
     @Trampoline_UxTheme_OpenThemeData := InterceptCreate(themelib, 'OpenThemeData', @Detour_UxTheme_OpenThemeData);

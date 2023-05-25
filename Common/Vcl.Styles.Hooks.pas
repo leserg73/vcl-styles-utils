@@ -51,9 +51,9 @@ uses
   Vcl.Styles.UxTheme,
   {$ENDIF HOOK_UXTHEME}
   Vcl.Styles.Utils.SysControls,
-{$IFDEF INNO_SETUP}
+{$IFDEF FONT_AWS}
   Vcl.Styles.FontAwesome,
-{$ENDIF INNO_SETUP}
+{$ENDIF FONT_AWS}
   Vcl.Forms,
   Vcl.Controls,
   Vcl.StdCtrls,
@@ -80,19 +80,19 @@ var
   Trampoline_user32_FillRect: function(hDC: hDC; const lprc: TRect; hbr: HBRUSH): Integer; stdcall;
   Trampoline_user32_DrawEdge: function(hDC: hDC; var qrc: TRect; edge: UINT; grfFlags: UINT): BOOL;  stdcall = nil;
   Trampoline_user32_DrawFrameControl: function (DC: HDC; Rect: PRect; uType, uState: UINT): BOOL; stdcall = nil;
-{$IFDEF INNO_SETUP}
+{$IFDEF FONT_AWS}
   Trampoline_user32_LoadIconW: function (hInstance: HINST; lpIconName: PWideChar): HICON; stdcall = nil;
-{$ENDIF INNO_SETUP}
+{$ENDIF FONT_AWS}
   Trampoline_user32_GetSysColorBrush: function(nIndex: Integer): HBRUSH; stdcall;
-{$IFDEF INNO_SETUP}
+{$IFDEF FONT_AWS}
   {$IFDEF HOOK_UXTHEME}
   Trampoline_user32_LoadImageW: function (hInst: HINST; ImageName: LPCWSTR; ImageType: UINT; X, Y: Integer; Flags: UINT): THandle; stdcall = nil;
   {$ELSE}
-{$ENDIF INNO_SETUP}
+{$ENDIF FONT_AWS}
   Trampoline_user32_GetSysColor: function(nIndex: Integer): DWORD; stdcall;
-{$IFDEF INNO_SETUP}
+{$IFDEF FONT_AWS}
   {$ENDIF HOOK_UXTHEME}
-{$ENDIF INNO_SETUP}
+{$ENDIF FONT_AWS}
 
 {$IFDEF HOOK_TDateTimePicker}
   {$IF CompilerVersion>=29}
@@ -462,7 +462,7 @@ begin
     Result := StyleServices.GetSystemColor(clHighlight);
 end;
 
-{$IFDEF INNO_SETUP}
+{$IFDEF FONT_AWS}
 function Detour_LoadIconW(_hInstance: HINST; lpIconName: PWideChar): HICON; stdcall;
 var
   s: string;
@@ -799,7 +799,7 @@ begin
   Exit(Trampoline_user32_LoadImageW(hInst, ImageName, ImageType, X, Y, Flags));
 end;
 {$ENDIF HOOK_UXTHEME}
-{$ENDIF INNO_SETUP}
+{$ENDIF FONT_AWS}
 
 
 {$IFDEF HOOK_TDateTimePicker}
@@ -864,14 +864,14 @@ initialization
     @Trampoline_user32_FillRect := InterceptCreate(user32, 'FillRect', @Detour_FillRect);
     @Trampoline_user32_DrawEdge := InterceptCreate(user32, 'DrawEdge', @Detour_DrawEdge);
     @Trampoline_user32_DrawFrameControl :=  InterceptCreate(user32, 'DrawFrameControl', @Detour_WinApi_DrawFrameControl);
-  {$IFDEF INNO_SETUP}
+  {$IFDEF FONT_AWS}
     @Trampoline_user32_LoadIconW := InterceptCreate(user32, 'LoadIconW', @Detour_LoadIconW);
   {$IFDEF HOOK_UXTHEME}
     if TOSVersion.Check(6) then
      @Trampoline_user32_LoadImageW := InterceptCreate(user32, 'LoadImageW', @Detour_LoadImageW);
 
   {$ENDIF HOOK_UXTHEME}
-  {$ENDIF INNO_SETUP}
+  {$ENDIF FONT_AWS}
 
     @Trampoline_SetStyle := InterceptCreate(@LSetStylePtr, @Detour_SetStyle);
 
@@ -893,14 +893,14 @@ finalization
   InterceptRemove(@Trampoline_user32_FillRect);
   InterceptRemove(@Trampoline_user32_DrawEdge);
   InterceptRemove(@Trampoline_user32_DrawFrameControl);
-{$IFDEF INNO_SETUP}
+{$IFDEF FONT_AWS}
   InterceptRemove(@Trampoline_user32_LoadIconW);
 
 {$IFDEF HOOK_UXTHEME}
   if TOSVersion.Check(6) then
     InterceptRemove(@Trampoline_user32_LoadImageW);
 {$ENDIF HOOK_UXTHEME}
-{$ENDIF INNO_SETUP}
+{$ENDIF FONT_AWS}
   InterceptRemove(@Trampoline_SetStyle);
 
 {$IFDEF HOOK_TDateTimePicker}
